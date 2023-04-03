@@ -1,0 +1,6 @@
+# ignore directories
+.idea/
+.git/
+
+# ignore files
+upwork.py
