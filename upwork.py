@@ -12,13 +12,13 @@ import time
 
 openai.api_key = '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'
 
-# def get_anchor_elements_within_class_name(class_name):
-#     elements = driver.find_elements(By.CLASS_NAME, class_name)
-#     anchor_elements = [element.find_element(By.TAG_NAME, 'a') for element in elements]
-#     return anchor_elements
+def get_anchor_elements_within_class_name(class_name):
+    elements = driver.find_elements(By.CLASS_NAME, class_name)
+    anchor_elements = [element.find_element(By.TAG_NAME, 'a') for element in elements]
+    return anchor_elements
 
-# def get_text_from_anchor_elements(anchor_elements):
-#     return [anchor.text for anchor in anchor_elements]
+def get_text_from_anchor_elements(anchor_elements):
+    return [anchor.text for anchor in anchor_elements]
 
 # def get_relevance_score(prompt):
 #     print("Getting relevance score for prompt: " + prompt)
@@ -46,13 +46,13 @@ openai.api_key = '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'
 
 options = Options()
 options.add_argument("--user-data-dir=C:\\Users\\User\\Desktop\\upwork")
-options.add_argument("--window-size=1920,1080")
-options.add_argument("--disable-gpu")
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
+# options.add_argument("--window-size=1920,1080")
+# options.add_argument("--disable-gpu")
+# options.add_argument("--no-sandbox")
+# options.add_argument("--disable-dev-shm-usage")
 
-options.add_argument(
-    "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
+# options.add_argument(
+#     "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
 options.page_load_strategy = 'normal'
 
 driver = webdriver.Chrome(options=options)
@@ -63,7 +63,7 @@ params = {
 }
 driver.execute_cdp_cmd("Page.setGeolocationOverride", params)
 
-def generate_cover_letter():
+def generate_cover_letter(job_details):
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -73,15 +73,10 @@ def generate_cover_letter():
             },
             {
                 "role": "user",
-                "content": (
-                    "Write a personalized cover letter for a Java Developer position "
-                    "highlighting the following skills and experiences: "
-                    "Java, Spring, Spring Boot, JavaScript, HTML, CSS, Linux, Docker, Kubernetes, "
-                    "Selenium, Git, RESTful APIs, BASH, B2B Implementation, IT Project Solutions, "
-                    "Cross-functional collaboration, Multilingual skills, Project Management, "
-                    "Agile methodologies, Testing, BDD, TDD, Mobile Application Development, "
-                    "and Database Management."
-                )
+                "content": f"""Here is my CV:
+I have 4 years of experience in software development with a focus on Java, Spring, Spring Boot, JavaScript, HTML, CSS, Linux, Docker, Kubernetes, Selenium, Git, RESTful APIs, BASH, B2B Implementation, IT Project Solutions, Cross-functional collaboration, Multilingual skills, Project Management, Agile methodologies, Testing, BDD, TDD, Mobile Application Development, and Database Management,
+please write a 4000 character cover letter for the following job post on upwork.com. note that this is for contract jobs a nd projects, not full time positions. Write is as ayman harake. and ommit the intro and signature. so don't say 'dear ...:
+                {job_details}."""
             }
         ],
         max_tokens=200,
@@ -94,10 +89,19 @@ def generate_cover_letter():
 
 driver.get(
     "https://www.upwork.com/nx/jobs/search/?q=java&sort=recency&user_location_match=2&t=0&hourly_rate=10-&location=Americas,Europe,Oceania")
-# wait = WebDriverWait(driver, 10)
-# wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
 
-# anchor_elements = get_anchor_elements_within_class_name('up-card-list-section')
+
+
+
+wait = WebDriverWait(driver, 10)
+wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
+
+anchor_elements = get_anchor_elements_within_class_name('up-card-list-section')
+
+#temp code
+anchor_elements[0].click()
+#temp code
+
 # text_list = get_text_from_anchor_elements(anchor_elements)
 
 # job_scores = []
@@ -144,7 +148,14 @@ driver.switch_to.window(driver.window_handles[-1])
 textbox = WebDriverWait(driver, 60).until(
     EC.element_to_be_clickable((By.XPATH, '//textarea[@aria-labelledby="cover_letter_label"]'))
 )
-textbox.send_keys(generate_cover_letter())
+
+
+
+job_details = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'fe-job-details'))).text
+
+
+
+textbox.send_keys(generate_cover_letter(job_details))
 
 driver.back()
 print("Navigated back to job search results")
