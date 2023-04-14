@@ -1,3 +1,5 @@
+import time
+import os
 import openai
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -18,32 +20,47 @@ def get_anchor_elements_within_class_name(class_name):
 def get_text_from_anchor_elements(anchor_elements):
     return [anchor.text for anchor in anchor_elements]
 
+
 def get_relevance_score(prompt):
-    print("Getting relevance score for prompt: " + prompt)
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {
-                "role": "system",
-                "content": f"You are a helpful assistant that rates the relevance of job titles to given skills: {skills}"
-            },
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ]
-    )
-    response_text = response['choices'][0]['message']['content'].strip()
-    
-    score = re.search(r'\d+(\.\d+)?', response_text)
-    if score:
-        return float(score.group())
-    else:
-        print("No numerical value found in the response.")
-        return None
+    while True:
+        try:
+            print("Getting relevance score for prompt: " + prompt)
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": f"You are a helpful assistant that rates the relevance of job titles to given skills: {skills}"
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            )
+            response_text = response['choices'][0]['message']['content'].strip()
+
+            score = re.search(r'\d+(\.\d+)?', response_text)
+            if score:
+                return float(score.group())
+            else:
+                print("No numerical value found in the response.")
+                return None
+        except openai.error.RateLimitError as e:
+            wait_seconds = int(re.search(r"Please try again in (\d+)s", str(e)).group(1))
+            print(f"Rate limit reached. Waiting for {wait_seconds} seconds before retrying.")
+            time.sleep(wait_seconds + 1)  # Add 1 second to ensure the rate limit has reset
+
+
+
+
+
+current_directory = os.path.dirname(os.path.abspath(__file__))
+user_data_directory = os.path.join(current_directory, 'upwork_profile')
+
 
 options = Options()
-options.add_argument("--user-data-dir=C:\\Users\\User\\Desktop\\upwork")
+options.add_argument(f"--user-data-dir={user_data_directory}")
 
 options.page_load_strategy = 'normal'
 
