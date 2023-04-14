@@ -17,6 +17,13 @@ def get_anchor_elements_within_class_name(class_name):
     anchor_elements = [element.find_element(By.TAG_NAME, 'a') for element in elements]
     return anchor_elements
 
+def get_more_button():
+    buttons = driver.find_elements(By.CLASS_NAME, "up-btn-link")
+    for button in buttons:
+        if button.text.lower() == "more":
+            return button
+    return None
+
 def get_text_from_anchor_elements(anchor_elements):
     return [anchor.text for anchor in anchor_elements]
 
@@ -141,6 +148,8 @@ for idx, element in enumerate(top_3_elements):
         EC.element_to_be_clickable((By.XPATH, '//textarea[@aria-labelledby="cover_letter_label"]'))
     )
     job_details = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'fe-job-details'))).text
+    more_button = get_more_button()
+    more_button.click()
     textbox.send_keys(generate_cover_letter(job_details))
     driver.close()
     driver.switch_to.window(driver.window_handles[0])
