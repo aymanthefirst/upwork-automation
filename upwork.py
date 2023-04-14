@@ -100,7 +100,7 @@ please write a cover letter with no more than 4000 characters for the following 
     return message
 
 driver.get(
-    "https://www.upwork.com/nx/jobs/search/?q=java&sort=recency&user_location_match=2&t=0&hourly_rate=10-&location=Americas,Europe,Oceania")
+    "https://www.upwork.com/nx/jobs/search/?q=java&sort=recency&user_location_match=2&ontology_skill_uid=1031626782313791488&location=Americas,Europe,Oceania")
 
 
 
@@ -142,6 +142,8 @@ for idx, element in enumerate(top_3_elements):
     )
     job_details = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'fe-job-details'))).text
     textbox.send_keys(generate_cover_letter(job_details))
+    driver.close()
+    driver.switch_to.window(driver.window_handles[0])
     driver.back()
     print("Navigated back to job search results")
     wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
