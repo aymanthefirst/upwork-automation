@@ -66,18 +66,21 @@ def generate_cover_letter(job_details):
             {
                 "role": "user",
                 "content": f"""Here is my CV:
-{skills}
-please write a 4000 character cover letter for the following job post on upwork.com. note that this is for contract jobs a nd projects, not full time positions. Write is as ayman harake. and ommit the intro and signature. so don't say 'dear ...:
+I have 4 years of experience in software development with a focus on Java, Spring, Spring Boot, JavaScript, HTML, CSS, Linux, Docker, Kubernetes, Selenium, Git, RESTful APIs, BASH, B2B Implementation, IT Project Solutions, Cross-functional collaboration, Multilingual skills, Project Management, Agile methodologies, Testing, BDD, TDD, Mobile Application Development, and Database Management,
+please write a cover letter with no more than 4000 characters for the following job post on upwork.com. Note that this is for contract jobs and projects, not full-time positions. Write it as Ayman Harake and omit the introduction and signature. Do not start with 'Dear Hiring Manager' or any similar salutation:
                 {job_details}."""
             }
         ],
-        max_tokens=200,
         temperature=0.7,
     )
 
     message = response.choices[0].message.content.strip()
+    # Limit the message to 4000 characters, minus 1 to account for potential newline character
+    message = message[:3999]
+    # Remove any leading salutation
+    message = re.sub(r"^(Dear|dear).*\n", "", message, flags=re.IGNORECASE)
+    message = message.lstrip()
     return message
-
 
 driver.get(
     "https://www.upwork.com/nx/jobs/search/?q=java&sort=recency&user_location_match=2&t=0&hourly_rate=10-&location=Americas,Europe,Oceania")
