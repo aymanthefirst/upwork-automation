@@ -17,12 +17,6 @@ def get_anchor_elements_within_class_name(class_name):
     anchor_elements = [element.find_element(By.TAG_NAME, 'a') for element in elements]
     return anchor_elements
 
-def get_more_button():
-    buttons = driver.find_elements(By.CLASS_NAME, "up-btn-link")
-    for button in buttons:
-        if button.text.lower() == "more":
-            return button
-    return None
 
 def get_text_from_anchor_elements(anchor_elements):
     return [anchor.text for anchor in anchor_elements]
@@ -31,7 +25,6 @@ def get_text_from_anchor_elements(anchor_elements):
 def get_relevance_score(prompt):
     while True:
         try:
-            print("Getting relevance score for prompt: " + prompt)
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
@@ -122,10 +115,11 @@ text_list = get_text_from_anchor_elements(anchor_elements)
 job_scores = []
 print("Getting relevance scores for job titles...")
 for job_title in text_list:
-    prompt = f"Rate the relevance of the following job title to the skills and experience mentioned in this CV: '{skills}'."
+    prompt = f"Rate the relevance of the following job title to the skills and experience mentioned in this CV. please answer in a numerical value. and give no more words than the one value: '{skills}'."
     score = get_relevance_score(prompt)
     if score is not None:  # Add this check to prevent adding None values
         job_scores.append((float(score), job_title))
+        print(f"Score: {score}, Job title: {job_title}")
 
 sorted_jobs = sorted(job_scores, key=lambda x: x[0], reverse=True)[:3]
 
@@ -147,9 +141,13 @@ for idx, element in enumerate(top_3_elements):
     textbox = WebDriverWait(driver, 60).until(
         EC.element_to_be_clickable((By.XPATH, '//textarea[@aria-labelledby="cover_letter_label"]'))
     )
+    try:
+        nowrap_element = driver.find_element(By.CLASS_NAME, 'up-truncation-label').click()
+        print('clicked on more button')
+    except IndexError:
+        nowrap_element = None
+        print("More button not found")
     job_details = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'fe-job-details'))).text
-    more_button = get_more_button()
-    more_button.click()
     textbox.send_keys(generate_cover_letter(job_details))
     driver.close()
     driver.switch_to.window(driver.window_handles[0])
