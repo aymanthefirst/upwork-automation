@@ -100,7 +100,7 @@ def generate_cover_letter(job_details):
             "role": "user",
             "content": f"""Here is my CV:
 I have 4 years of experience in software development with a focus on Java, Spring, chatgpt api implementation, Spring Boot, JavaScript, HTML, CSS, Linux, Docker, Kubernetes, Selenium, Git, RESTful APIs, BASH, B2B Implementation, IT Project Solutions, Cross-functional collaboration, Multilingual skills, Project Management, Agile methodologies, Testing, BDD, TDD, Mobile Application Development, and Database Management,
-please write a cover letter with no more than 4000 characters for the following job post on upwork.com. Note that this is for contract jobs and projects, not full-time positions. Write it as Ayman Harake and omit the introduction and signature. Do not start with 'Dear Hiring Manager' or any similar salutation. If the client is in america, mention that I am about to move to colombia despite being based in uk:
+please write a cover letter with no more than 4000 characters for the following job post on upwork.com. Note that this is for contract jobs and projects, not full-time positions. Write it as Ayman Harake and omit the introduction and signature. Do not start with 'Dear Hiring Manager' or any similar salutation. If the client is in America, mention that I am about to move to Colombia despite being based in the UK. Importantly, do not claim that I have experience in anything other than what I have listed here, and make sure to only mention the skills I have listed in my CV:
                 {job_details}."""
         }
     ])
