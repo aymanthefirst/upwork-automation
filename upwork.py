@@ -1,4 +1,4 @@
-from selenium.common.exceptions import ElementNotInteractableException
+from selenium.common.exceptions import ElementNotInteractableException, NoSuchElementException
 import time
 import os
 import openai
@@ -27,6 +27,14 @@ params = {
     "accuracy": 100
 }
 driver.execute_cdp_cmd("Page.setGeolocationOverride", params)
+
+def click_next_page():
+    next_button = driver.find_element(By.XPATH, '//button[contains(@class, "up-pagination-item") and contains(., "Next")]')
+    next_button.click()
+    print("Clicked on next button")
+    wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
+
+
 
 def get_gpt_response(messages):
     retries = 5
@@ -109,45 +117,39 @@ driver.get(
 wait = WebDriverWait(driver, 10)
 wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
 
-jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
+while True:
+    jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
 
-
-for job in jobs:
-    job_title = job.text
-    prompt = f"Rate the relevance of the following job title '{job_title}' to the skills and experience mentioned in this CV: '{skills}'. Please answer in a numerical value and give no more words than the one value."
-    score = get_relevance_score(prompt)
-    if score >= 9 or score >= 9.0:
-        # apply for job
-        wait = WebDriverWait(driver, 10) 
-        job.click()
-        print("Clicked on job title")
-        wait.until(lambda driver: EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'Submit Proposal')(driver) or EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'Apply Now')(driver))
-        print("Found 'Apply Now' button")
-        apply_now_button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, '//button[@aria-label="Apply Now"]'))
-        )
-        apply_now_button.click()
-        driver.switch_to.window(driver.window_handles[-1])
-        textbox = WebDriverWait(driver, 60).until(
-            EC.element_to_be_clickable((By.XPATH, '//textarea[@aria-labelledby="cover_letter_label"]'))
-        )
-        try:
-            nowrap_element = driver.find_element(By.CLASS_NAME, 'up-truncation-label').click()
-            print('clicked on more button')
-        except ElementNotInteractableException:
-            nowrap_element = None
-            print("More button not found")
-        job_details = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'fe-job-details'))).text
-        textbox.send_keys(generate_cover_letter(job_details))
-        driver.close()
-        driver.switch_to.window(driver.window_handles[0])
-        driver.back()
-        print("Navigated back to job search results")
-        wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
-
-
-
-
-
-
-
+    for job in jobs:
+        job_title = job.text
+        prompt = f"Rate the relevance of the following job title '{job_title}' to the skills and experience mentioned in this CV: '{skills}'. Please answer in a numerical value and give no more words than the one value."
+        score = get_relevance_score(prompt)
+        if score >= 9 or score >= 9.0:
+            # apply for job
+            wait = WebDriverWait(driver, 10) 
+            job.click()
+            print("Clicked on job title")
+            wait.until(lambda driver: EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'Submit Proposal')(driver) or EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'Apply Now')(driver))
+            print("Found 'Apply Now' button")
+            apply_now_button = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, '//button[@aria-label="Apply Now"]'))
+            )
+            apply_now_button.click()
+            driver.switch_to.window(driver.window_handles[-1])
+            textbox = WebDriverWait(driver, 60).until(
+                EC.element_to_be_clickable((By.XPATH, '//textarea[@aria-labelledby="cover_letter_label"]'))
+            )
+            try:
+                nowrap_element = driver.find_element(By.CLASS_NAME, 'up-truncation-label').click()
+                print('clicked on more button')
+            except ElementNotInteractableException:
+                nowrap_element = None
+                print("More button not found")
+            job_details = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'fe-job-details'))).text
+            textbox.send_keys(generate_cover_letter(job_details))
+            driver.close()
+            driver.switch_to.window(driver.window_handles[0])
+            driver.back()
+            print("Navigated back to job search results")
+            wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
+    click_next_page()
