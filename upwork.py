@@ -104,12 +104,12 @@ def generate_cover_letter(job_details):
             "role": "user",
             "content": f"""Here is my CV:
 {skills}
-please write a cover letter with no more than 4000 characters for the following job post on upwork.com. Note that this is for contract jobs and projects, not full-time positions. Write it as Ayman Harake and omit the introduction and signature. Do not start with 'Dear Hiring Manager' or any similar salutation. Do not mention attachments, money, or the job title.{south_america_mention}. Importantly, do not claim that I have experience in anything other than what I have listed here, and make sure to only mention the skills I have listed in my CV: {relevant_skills}. Here are the job details:
-                {job_details}."""
+write a 200 word cover letter for the following job post on upwork.com. Note that this is for contract jobs and projects, not full-time positions. Write it as Ayman Harake and omit the introduction and signature. Do not start with 'Dear Hiring Manager' or any similar salutation. Do not mention attachments, money, or the job title.{south_america_mention}. Importantly, do not claim that I have experience in anything other than what I have listed here, and make sure to only mention the skills I have listed in my CV: {relevant_skills}. Here are the job details:
+                {job_details}. Do not include an introduction line. Also, do not write a paragraph that summarizes the CV."""  # Add this line here
         }
     ])
     message = response.choices[0].message.content.strip()
-    message = message[:3999]
+    message = message[:1999]
     message = re.sub(r"^(Dear|dear).*\n", "", message, flags=re.IGNORECASE)
     message = re.sub(r"I am writing to apply.*?\.\n", "", message, flags=re.IGNORECASE)
     message = message.lstrip()
@@ -174,4 +174,5 @@ while True:
             print("Navigated back to job search results")
             wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
     click_next_page()
+    time.sleep(5)
     jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
