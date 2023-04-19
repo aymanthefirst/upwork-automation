@@ -106,7 +106,7 @@ write a 200 word cover letter for the following job post on upwork.com. only men
             },
             {
                 "role": "user",
-                "content": f"Please revise the following text to be less than 2000 characters. Do not respond with anything more than the message itself: {message}"
+                "content": f"Please revise the following cover letter to be less than 2000 characters. Use more than one paragraph Do not respond with anything more than the message itself: {message}"
             }
         ])
         message = response.choices[0].message.content.strip()
