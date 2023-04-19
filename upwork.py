@@ -16,6 +16,8 @@ current_directory = os.path.dirname(os.path.abspath(__file__))
 user_data_directory = os.path.join(current_directory, 'upwork_profile')
 
 options = Options()
+options.add_experimental_option('excludeSwitches', ['enable-logging'])
+options.add_argument('--disable-dev-shm-usage')
 options.add_argument(f"--user-data-dir={user_data_directory}")
 
 options.page_load_strategy = 'normal'
@@ -33,8 +35,6 @@ def click_next_page():
     next_button.click()
     print("Clicked on next button")
     wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
-
-
 
 def get_gpt_response(messages):
     retries = 5
@@ -55,7 +55,6 @@ def get_gpt_response(messages):
             retries -= 1
             time.sleep(5)
     raise Exception("Unable to get a response from GPT-3.5-turbo after multiple retries.")
-
 
 def get_relevance_score(prompt):
     response = get_gpt_response([
@@ -91,12 +90,27 @@ def generate_cover_letter(job_details):
             "role": "user",
             "content": f"""Here is my CV:
 {skills}
-write a 200 word cover letter for the following job post on upwork.com. Note that this is for contract jobs and projects, not full-time positions. Write it as Ayman Harake and omit the introduction and signature. Do not start with 'Dear Hiring Manager' or any similar salutation. Do not mention attachments, money, or the job title.{south_america_mention}. Importantly, do not claim that I have experience in anything other than what I have listed here, and make sure to only mention the skills I have listed in my CV: {relevant_skills}. Here are the job details:
+write a 200 word cover letter for the following job post on upwork.com. only mention the skills that I have that are relevant to the job description. do not introduce the message by mentioning the jobtitle or platform. Note that this is for contract jobs and projects, not full-time positions. Write it as Ayman Harake and omit the introduction and signature. Do not start with 'Dear Hiring Manager' or any similar salutation. Do not mention attachments, money, or the job title.{south_america_mention}. Importantly, do not claim that I have experience in anything other than what I have listed here, and make sure to only mention the skills I have listed in my CV: {relevant_skills}. Here are the job details:
                 {job_details}. Do not include an introduction line. Also, do not write a paragraph that summarizes the CV."""  # Add this line here
         }
     ])
+
     message = response.choices[0].message.content.strip()
-    message = message[:1999]
+
+    while len(message.split()) > 200:
+        print("Cover letter too long. Retrying with a shorter prompt.")
+        response = get_gpt_response([
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that revises text to fit within a specified character limit."
+            },
+            {
+                "role": "user",
+                "content": f"Please revise the following text to be less than 2000 characters. Do not respond with anything more than the message itself: {message}"
+            }
+        ])
+        message = response.choices[0].message.content.strip()
+
     message = re.sub(r"^(Dear|dear).*\n", "", message, flags=re.IGNORECASE)
     message = re.sub(r"I am writing to apply.*?\.\n", "", message, flags=re.IGNORECASE)
     message = message.lstrip()
@@ -155,6 +169,7 @@ while True:
                 print("More button not found")
             job_details = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'fe-job-details'))).text
             textbox.send_keys(generate_cover_letter(job_details))
+            time.sleep(5)
             driver.close()
             driver.switch_to.window(driver.window_handles[0])
             driver.back()
