@@ -57,19 +57,6 @@ def get_gpt_response(messages):
     raise Exception("Unable to get a response from GPT-3.5-turbo after multiple retries.")
 
 
-def get_gpt_response(messages):
-    while True:
-        try:
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=messages
-            )
-            return response
-        except openai.error.RateLimitError as e:
-            wait_seconds = int(re.search(r"Please try again in (\d+)s", str(e)).group(1))
-            print(f"Rate limit reached. Waiting for {wait_seconds} seconds before retrying.")
-            time.sleep(wait_seconds + 1)
-
 def get_relevance_score(prompt):
     response = get_gpt_response([
         {
