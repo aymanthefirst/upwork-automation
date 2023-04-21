@@ -30,6 +30,11 @@ params = {
 }
 driver.execute_cdp_cmd("Page.setGeolocationOverride", params)
 
+def close():
+    driver.close()
+    driver.switch_to.window(driver.window_handles[0])
+    driver.back()
+
 def click_next_page():
     next_button = driver.find_element(By.XPATH, '//button[contains(@class, "up-pagination-item") and contains(., "Next")]')
     next_button.click()
@@ -90,7 +95,7 @@ def generate_cover_letter(job_details):
             "role": "user",
             "content": f"""Here is my CV:
 {skills}
-write a 200 word cover letter for the following job post on upwork.com. only mention the skills that I have that are relevant to the job description. do not introduce the message by mentioning the jobtitle or platform. Note that this is for contract jobs and projects, not full-time positions. Write it as Ayman Harake and omit the introduction and signature. Do not start with 'Dear Hiring Manager' or any similar salutation. Do not mention attachments, money, or the job title.{south_america_mention}. Importantly, do not claim that I have experience in anything other than what I have listed here, and make sure to only mention the skills I have listed in my CV: {relevant_skills}. Here are the job details:
+write a 200 word cover letter for the following job post. only mention the skills that I have that are relevant to the job description. do not introduce the message by mentioning the jobtitle or platform. Note that this is for contract jobs and projects, not full-time positions. Write it as Ayman Harake and omit the introduction and signature. Do not start with 'Dear Hiring Manager' or any similar salutation. Do not mention attachments, money, or the job title.{south_america_mention}. Importantly, do not claim that I have experience in anything other than what I have listed here, and make sure to only mention the skills I have listed in my CV: {relevant_skills}. Here are the job details:
                 {job_details}. Do not include an introduction line. Also, do not write a paragraph that summarizes the CV."""  # Add this line here
         }
     ])
@@ -106,7 +111,7 @@ write a 200 word cover letter for the following job post on upwork.com. only men
             },
             {
                 "role": "user",
-                "content": f"Please revise the following cover letter to be less than 2000 characters. Use more than one paragraph Do not respond with anything more than the message itself: {message}"
+                "content": f"Please revise the following cover letter as Ayman harake to be less than 2000 characters. remove any part that mentions the name of the jobpost. Use more than one paragraph Do not respond with anything more than the message itself: {message}"
             }
         ])
         message = response.choices[0].message.content.strip()
@@ -152,6 +157,9 @@ while True:
             job.click()
             print("Clicked on job title")
             wait.until(lambda driver: EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'Submit Proposal')(driver) or EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'Apply Now')(driver))
+            if 'applied' in driver.find_element(By.TAG_NAME, 'body').text:
+                close()
+                continue
             print("Found 'Apply Now' button")
             apply_now_button = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH, '//button[@aria-label="Apply Now"]'))
@@ -170,9 +178,7 @@ while True:
             job_details = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'fe-job-details'))).text
             textbox.send_keys(generate_cover_letter(job_details))
             time.sleep(5)
-            driver.close()
-            driver.switch_to.window(driver.window_handles[0])
-            driver.back()
+            close()
             print("Navigated back to job search results")
             wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
     click_next_page()
