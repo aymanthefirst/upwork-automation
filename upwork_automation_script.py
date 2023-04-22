@@ -132,8 +132,12 @@ driver.get(
 wait = WebDriverWait(driver, 10)
 wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
 
-def run_automation(stop_flag): 
+def run_automation(stop_flag, pause_flag):
     while not stop_flag():
+        if pause_flag():
+            print("Automation paused. Waiting...")
+            time.sleep(5)
+            continue
         job_count = len(driver.find_elements(By.CLASS_NAME, 'up-card-list-section'))
         for index in range(job_count):
             jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
