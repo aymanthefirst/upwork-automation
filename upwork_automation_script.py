@@ -31,13 +31,20 @@ params = {
 }
 driver.execute_cdp_cmd("Page.setGeolocationOverride", params)
 
-def close(ask_continue=False):
+prompt_on_close = False
+def close(ask_continue=None):
+    global prompt_on_close
+    if ask_continue is None:
+        ask_continue = prompt_on_close
+
+    if ask_continue:
+        user_choice = messagebox.askyesno("Continue?", "Do you want to continue closing the browser?")
+        if not user_choice:
+            return
+
     driver.close()
     driver.switch_to.window(driver.window_handles[0])
     driver.back()
-    if ask_continue and not messagebox.askyesno("Continue?", "Do you want to continue the automation?"):
-        raise Exception("User chose to stop the automation.")
-
 
 def click_next_page():
     next_button = driver.find_element(By.XPATH, '//button[contains(@class, "up-pagination-item") and contains(., "Next")]')
@@ -115,7 +122,7 @@ write a 200 word cover letter for the following job post. only mention the skill
             },
             {
                 "role": "user",
-                "content": f"Please half the size of the following cover letter as Ayman harake to be less than 2000 characters. remove any part that mentions the name of the job post. Use more than one paragraph: {message}"
+                "content": f"Cover letter is too long. please remove the least imoprtant paragraph: {message}"
             }
         ])
         message = response.choices[0].message.content.strip()

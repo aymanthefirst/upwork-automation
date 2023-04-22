@@ -5,56 +5,10 @@ import upwork_automation_script
 import sys
 import io
 
-def toggle_prompt_on_close():
-    upwork_automation_script.prompt_on_close = not upwork_automation_script.prompt_on_close
-    prompt_on_close_button.config(text=f"Prompt on Close: {upwork_automation_script.prompt_on_close}")
-
-root = tk.Tk()
-root.title("Upwork Automation")
-
 class UpworkAutomationGUI:
     def __init__(self, master):
         self.master = master
-        self.master.title("Upwork import tkinter as tk
-from tkinter import ttk
-import upwork_automation_script
-
-def toggle_prompt_on_close():
-    upwork_automation_script.prompt_on_close = not upwork_automation_script.prompt_on_close
-    prompt_on_close_button.config(text=f"Prompt on Close: {upwork_automation_script.prompt_on_close}")
-
-root = tk.Tk()
-root.title("Upwork Automation")
-
-mainframe = ttk.Frame(root, padding="3 3 12 12")
-mainframe.grid(column=0, row=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-root.columnconfigure(0, weight=1)
-root.rowconfigure(0, weight=1)
-
-# Add input fields, labels, and buttons as needed
-# For example:
-username_label = ttk.Label(mainframe, text="Username:")
-username_label.grid(column=1, row=1, sticky=tk.W)
-username_entry = ttk.Entry(mainframe)
-username_entry.grid(column=2, row=1, sticky=(tk.W, tk.E))
-
-password_label = ttk.Label(mainframe, text="Password:")
-password_label.grid(column=1, row=2, sticky=tk.W)
-password_entry = ttk.Entry(mainframe, show="*")
-password_entry.grid(column=2, row=2, sticky=(tk.W, tk.E))
-
-submit_button = ttk.Button(mainframe, text="Submit", command=upwork_automation_script.some_function)  # Replace "some_function" with the actual function
-submit_button.grid(column=2, row=3, sticky=tk.W)
-
-# Add a button to toggle the prompt on close behavior
-prompt_on_close_button = ttk.Button(mainframe, text=f"Prompt on Close: {upwork_automation_script.prompt_on_close}", command=toggle_prompt_on_close)
-prompt_on_close_button.grid(column=2, row=4, sticky=tk.W)
-
-for child in mainframe.winfo_children():
-    child.grid_configure(padx=5, pady=5)
-
-root.mainloop()
-Automation")
+        self.master.title("Upwork Automation")
 
         # Add some labels to provide context
         self.start_label = tk.Label(self.master, text="Please login to upwork and navigate and create a search for jobs. Then click start to begin the automation.")
@@ -83,6 +37,17 @@ Automation")
         # Redirect standard output to the Text widget
         sys.stdout = TextRedirector(self.console_log)
 
+        def toggle_prompt_on_close():
+            upwork_automation_script.prompt_on_close = not upwork_automation_script.prompt_on_close
+            if upwork_automation_script.prompt_on_close:
+                self.prompt_on_close_button.configure(bg="green", text="Prompt on Close: ON")
+            else:
+                self.prompt_on_close_button.configure(bg="red", text="Prompt on Close: OFF")
+
+        self.prompt_on_close_button = tk.Button(self.master, text="Prompt on Close: OFF", command=toggle_prompt_on_close)
+        self.prompt_on_close_button.configure(bg="red")
+        self.prompt_on_close_button.grid(row=4, column=0, columnspan=3)
+
     def start_automation(self):
         if not self.automation_thread or not self.automation_thread.is_alive():
             self.start_label.grid_remove()
@@ -93,7 +58,6 @@ Automation")
             self.start_button.config(state=tk.DISABLED)
             self.pause_button.config(state=tk.NORMAL)
             self.stop_button.config(state=tk.NORMAL)
-
 
     def pause_automation(self):
         self.pause_flag = not self.pause_flag
