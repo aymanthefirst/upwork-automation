@@ -31,10 +31,13 @@ params = {
 }
 driver.execute_cdp_cmd("Page.setGeolocationOverride", params)
 
-def close():
+def close(ask_continue=False):
     driver.close()
     driver.switch_to.window(driver.window_handles[0])
     driver.back()
+    if ask_continue and not messagebox.askyesno("Continue?", "Do you want to continue the automation?"):
+        raise Exception("User chose to stop the automation.")
+
 
 def click_next_page():
     next_button = driver.find_element(By.XPATH, '//button[contains(@class, "up-pagination-item") and contains(., "Next")]')
@@ -133,60 +136,63 @@ wait = WebDriverWait(driver, 10)
 wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
 
 def run_automation(stop_flag, pause_flag):
-    while not stop_flag():
-        if pause_flag():
-            print("Automation paused. Waiting...")
-            time.sleep(5)
-            continue
-        job_count = len(driver.find_elements(By.CLASS_NAME, 'up-card-list-section'))
-        for index in range(job_count):
-            jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
-            job = jobs[index]
-
-            job = jobs[index]
-            job_title = job.text
-            if 'applied' in job_title.lower():
-                print("Job already applied. Skipping...")
-                continue
-            if 'less than a month' in job_title.lower():
-                print("Job posted less than a month ago. Skipping...")
-                continue
-            budget = re.search(r'Est. Budget: \$([\d,]+)', job_title)
-            if budget and int(budget.group(1).replace(',', '')) < 600:
-                print("Budget is less than $600. Skipping...")
-                continue
-            prompt = f"Rate the relevance of the following job title '{job_title}' to the skills and experience mentioned in this CV: '{skills}'. Please answer in a numerical value and give no more words than the one value."
-            score = get_relevance_score(prompt)
-            if score >= 9 or score >= 9.0:
-                # apply for job
-                wait = WebDriverWait(driver, 10) 
-                job.click()
-                print("Clicked on job title")
-                wait.until(lambda driver: EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'Submit Proposal')(driver) or EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'Apply Now')(driver))
-                if 'applied' in driver.find_element(By.TAG_NAME, 'body').text:
-                    close()
-                    continue
-                print("Found 'Apply Now' button")
-                apply_now_button = WebDriverWait(driver, 10).until(
-                    EC.element_to_be_clickable((By.XPATH, '//button[@aria-label="Apply Now"]'))
-                )
-                apply_now_button.click()
-                driver.switch_to.window(driver.window_handles[-1])
-                textbox = WebDriverWait(driver, 60).until(
-                    EC.element_to_be_clickable((By.XPATH, '//textarea[@aria-labelledby="cover_letter_label"]'))
-                )
-                try:
-                    nowrap_element = driver.find_element(By.CLASS_NAME, 'up-truncation-label').click()
-                    print('clicked on more button')
-                except ElementNotInteractableException:
-                    nowrap_element = None
-                    print("More button not found")
-                job_details = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'fe-job-details'))).text
-                textbox.send_keys(generate_cover_letter(job_details))
+    try:
+        while not stop_flag():
+            if pause_flag():
+                print("Automation paused. Waiting...")
                 time.sleep(5)
-                close()
-                print("Navigated back to job search results")
-                wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
-        click_next_page()
-        time.sleep(5)
-        jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
+                continue
+            job_count = len(driver.find_elements(By.CLASS_NAME, 'up-card-list-section'))
+            for index in range(job_count):
+                jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
+                job = jobs[index]
+
+                job = jobs[index]
+                job_title = job.text
+                if 'applied' in job_title.lower():
+                    print("Job already applied. Skipping...")
+                    continue
+                if 'less than a month' in job_title.lower():
+                    print("Job posted less than a month ago. Skipping...")
+                    continue
+                budget = re.search(r'Est. Budget: \$([\d,]+)', job_title)
+                if budget and int(budget.group(1).replace(',', '')) < 600:
+                    print("Budget is less than $600. Skipping...")
+                    continue
+                prompt = f"Rate the relevance of the following job title '{job_title}' to the skills and experience mentioned in this CV: '{skills}'. Please answer in a numerical value and give no more words than the one value."
+                score = get_relevance_score(prompt)
+                if score >= 9 or score >= 9.0:
+                    # apply for job
+                    wait = WebDriverWait(driver, 10) 
+                    job.click()
+                    print("Clicked on job title")
+                    wait.until(lambda driver: EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'Submit Proposal')(driver) or EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'Apply Now')(driver))
+                    if 'applied' in driver.find_element(By.TAG_NAME, 'body').text:
+                        close()
+                        continue
+                    print("Found 'Apply Now' button")
+                    apply_now_button = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.XPATH, '//button[@aria-label="Apply Now"]'))
+                    )
+                    apply_now_button.click()
+                    driver.switch_to.window(driver.window_handles[-1])
+                    textbox = WebDriverWait(driver, 60).until(
+                        EC.element_to_be_clickable((By.XPATH, '//textarea[@aria-labelledby="cover_letter_label"]'))
+                    )
+                    try:
+                        nowrap_element = driver.find_element(By.CLASS_NAME, 'up-truncation-label').click()
+                        print('clicked on more button')
+                    except ElementNotInteractableException:
+                        nowrap_element = None
+                        print("More button not found")
+                    job_details = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'fe-job-details'))).text
+                    textbox.send_keys(generate_cover_letter(job_details))
+                    time.sleep(5)
+                    close()
+                    print("Navigated back to job search results")
+                    wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
+            click_next_page()
+            time.sleep(5)
+            jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
+    except Exception as e:
+        print(str(e))
