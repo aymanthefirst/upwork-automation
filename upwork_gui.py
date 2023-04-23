@@ -4,6 +4,7 @@ import threading
 import upwork_automation_script
 import sys
 import io
+import tkinter
 
 class UpworkAutomationGUI:
     def __init__(self, master):
@@ -21,6 +22,8 @@ class UpworkAutomationGUI:
         self.stop_flag = False
         self.pause_flag = False
 
+        self.skip_matching = False
+
         # Add a Text widget to display console logs
         self.console_log = tk.Text(self.master, wrap=tk.WORD, height=10)
         self.console_log.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
@@ -28,6 +31,15 @@ class UpworkAutomationGUI:
         # Redirect standard output to the Text widget
         sys.stdout = TextRedirector(self.console_log)
 
+        def toggle_skip_matching():
+            self.skip_matching = not self.skip_matching
+            print(f"Skip matching: {self.skip_matching}")
+            if self.skip_matching:
+                skip_matching_button.configure(bg="green", text="Skip Matching: ON")
+            else:
+                skip_matching_button.configure(bg="red", text="Skip Matching: OFF")
+
+        
         def toggle_prompt_on_close():
             upwork_automation_script.prompt_on_close = not upwork_automation_script.prompt_on_close
             if upwork_automation_script.prompt_on_close:
@@ -39,12 +51,15 @@ class UpworkAutomationGUI:
         self.prompt_on_close_button.configure(bg="red")
         self.prompt_on_close_button.grid(row=1, column=1, padx=(10, 20), pady=(0, 20))
 
+        skip_matching_button = tkinter.Button(text="Skip Matching: OFF", command=toggle_skip_matching, bg="red")
+        skip_matching_button.grid(row=3, column=0, columnspan=2, pady=(0, 20))
+
     def start_automation(self):
         if not self.automation_thread or not self.automation_thread.is_alive():
             self.start_label.grid_remove()
             self.stop_flag = False
             self.pause_flag = False
-            self.automation_thread = threading.Thread(target=upwork_automation_script.run_automation, args=(lambda: self.stop_flag, lambda: self.pause_flag))
+            self.automation_thread = threading.Thread(target=upwork_automation_script.run_automation, args=(lambda: self.stop_flag, lambda: self.pause_flag, self))
             self.automation_thread.start()
 
 class TextRedirector(io.TextIOBase):
