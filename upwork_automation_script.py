@@ -42,7 +42,13 @@ def close_with_prompt(ask_continue=None):
         if user_choice:
             submit_button = driver.find_element(By.XPATH, "//button[contains(., 'send') or contains(., 'Send')]")
             submit_button.click()
-            WebDriverWait(driver, 10).until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'Your proposal was submitted.'))
+            try:
+                WebDriverWait(driver, 10).until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'Your proposal was submitted.'))
+            except:
+                print('Error in submitting application. Skipping...')
+                messagebox.showerror("Error", "Error in submitting application. Please manually submit it, then click ok to continue.")
+                close()
+                return True
     driver.close()
     driver.switch_to.window(driver.window_handles[0])
     driver.back()
@@ -60,11 +66,15 @@ def apply(job):
     wait.until(lambda driver: EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'Submit Proposal')(driver) or EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'Apply Now')(driver))
     if 'applied' in driver.find_element(By.TAG_NAME, 'body').text:
         print("Job already applied. Skipping...")
-        close()
+        driver.back()
         return True
+    if 'submitted' in driver.find_element(By.TAG_NAME, 'body').text:
+            print("Job already applied. Skipping...")
+            driver.back()
+            return True    
     if "You do not meet all the client's preferred qualifications" in driver.find_element(By.TAG_NAME, 'body').text:
         print("You do not meet all the client's preferred qualifications. Skipping...")
-        close()
+        driver.back()
         return True
     print("Found 'Apply Now' button")
     apply_now_button = WebDriverWait(driver, 10).until(
