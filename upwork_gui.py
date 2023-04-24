@@ -50,7 +50,7 @@ class UpworkAutomationGUI:
         self.prompt_on_close_button.configure(bg="red")
         self.prompt_on_close_button.grid(row=3, column=0, padx=(20, 10), pady=(0, 20))
 
-        skip_matching_button = tkinter.Button(text="Skip Matching: OFF", command=toggle_skip_matching, bg="red")
+        skip_matching_button = tkinter.Button(text="AI Matching: OFF", command=toggle_skip_matching, bg="red")
         skip_matching_button.grid(row=3, column=1, padx=(10, 20), pady=(0, 20))
 
         self.keywords_label = tk.Label(self.master, text="Please enter the keywords to avoid:")
@@ -61,8 +61,10 @@ class UpworkAutomationGUI:
 
         def save_keywords():
             keywords = self.keywords_entry.get()
-            # Save the keywords or perform the desired action
+            with open("keywords_to_avoid.txt", "w") as file:
+                file.write(keywords)
             print("Keywords saved:", keywords)
+
 
         self.save_button = tk.Button(self.master, text="Save", command=save_keywords, padx=10, pady=5, bg="#007bff", fg="white")
         self.save_button.grid(row=4, column=2, padx=(0, 20), pady=(0, 20), sticky='w')

@@ -58,6 +58,10 @@ def close():
     driver.switch_to.window(driver.window_handles[0])
     driver.back()
 
+def get_keywords_to_avoid():
+    with open("keywords_to_avoid.txt", "r") as file:
+        keywords = file.read()
+    return keywords.split(',')
 
 def apply(job):
     wait = WebDriverWait(driver, 10) 
@@ -115,6 +119,14 @@ def exit_if_multiple_textboxes():
     if len(textareas) > 1:
         print('More than one textarea on the page. Skipping job...')
         raise ValueError("More than one textarea on the page.")
+    
+def should_skip_job(job_title, keywords_to_avoid):
+    for keyword in keywords_to_avoid:
+        keyword = keyword.strip().lower()
+        if keyword and keyword in job_title.lower():
+            print(f"Keyword '{keyword}' found in job title. Skipping...")
+            return True
+    return False
 
 
 def get_gpt_response(messages):
@@ -212,6 +224,7 @@ def run_automation(stop_flag, pause_flag, gui_instance=None):
         while not stop_flag():
             job_count = len(driver.find_elements(By.CLASS_NAME, 'up-card-list-section'))
             for index in range(job_count):
+                keywords_to_avoid = get_keywords_to_avoid()
                 jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
                 job = jobs[index]
                 job = jobs[index]
@@ -220,15 +233,11 @@ def run_automation(stop_flag, pause_flag, gui_instance=None):
                     print("Skip matching is enabled. Clicking on the first job title.")
                     apply(job)
                     continue
-                if 'applied' in job_title.lower():
-                    print("Job already applied. Skipping...")
-                    continue
-                if 'less than a month' in job_title.lower():
-                    print("Job posted less than a month ago. Skipping...")
-                    continue
                 budget = re.search(r'Est. Budget: \$([\d,]+)', job_title)
                 if budget and int(budget.group(1).replace(',', '')) < 600:
                     print("Budget is less than $600. Skipping...")
+                    continue
+                if should_skip_job(job_title, keywords_to_avoid):
                     continue
                 prompt = f"Rate the relevance of the following job title '{job_title}' to the skills and experience mentioned in this CV: '{skills}'. Please answer in a numerical value and give no more words than the one value."
                 score = get_relevance_score(prompt)
