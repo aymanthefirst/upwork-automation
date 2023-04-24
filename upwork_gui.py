@@ -38,7 +38,6 @@ class UpworkAutomationGUI:
                 skip_matching_button.configure(bg="green", text="Skip Matching: ON")
             else:
                 skip_matching_button.configure(bg="red", text="Skip Matching: OFF")
-
         
         def toggle_prompt_on_close():
             upwork_automation_script.prompt_on_close = not upwork_automation_script.prompt_on_close
@@ -53,6 +52,24 @@ class UpworkAutomationGUI:
 
         skip_matching_button = tkinter.Button(text="Skip Matching: OFF", command=toggle_skip_matching, bg="red")
         skip_matching_button.grid(row=3, column=0, columnspan=2, pady=(0, 20))
+
+        skip_matching_button = tkinter.Button(text="Skip Matching: OFF", command=toggle_skip_matching, bg="red")
+        skip_matching_button.grid(row=3, column=0, columnspan=2, pady=(0, 20))
+
+        self.keywords_label = tk.Label(self.master, text="Please enter the keywords to avoid:")
+        self.keywords_label.grid(row=4, column=0, padx=(20, 10), pady=(0, 5), sticky='w')
+
+        self.keywords_entry = tk.Entry(self.master, width=60)
+        self.keywords_entry.grid(row=4, column=1, padx=(0, 10), pady=(0, 20), sticky='w')
+
+        def save_keywords():
+            keywords = self.keywords_entry.get()
+            # Save the keywords or perform the desired action
+            print("Keywords saved:", keywords)
+
+        self.save_button = tk.Button(self.master, text="Save", command=save_keywords, padx=10, pady=5, bg="#007bff", fg="white")
+        self.save_button.grid(row=4, column=2, padx=(0, 20), pady=(0, 20), sticky='w')
+
 
     def start_automation(self):
         if not self.automation_thread or not self.automation_thread.is_alive():
