@@ -3,4 +3,5 @@
 .git/
 upwork_profile/
 keywords_to_avoid.txt
-*.pyc*
+*.pyc
+__pycache__/
