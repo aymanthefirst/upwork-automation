@@ -48,13 +48,10 @@ class UpworkAutomationGUI:
 
         self.prompt_on_close_button = tk.Button(self.master, text="Prompt before exiting tab: OFF", command=toggle_prompt_on_close)
         self.prompt_on_close_button.configure(bg="red")
-        self.prompt_on_close_button.grid(row=1, column=1, padx=(10, 20), pady=(0, 20))
+        self.prompt_on_close_button.grid(row=3, column=0, padx=(20, 10), pady=(0, 20))
 
         skip_matching_button = tkinter.Button(text="Skip Matching: OFF", command=toggle_skip_matching, bg="red")
-        skip_matching_button.grid(row=3, column=0, columnspan=2, pady=(0, 20))
-
-        skip_matching_button = tkinter.Button(text="Skip Matching: OFF", command=toggle_skip_matching, bg="red")
-        skip_matching_button.grid(row=3, column=0, columnspan=2, pady=(0, 20))
+        skip_matching_button.grid(row=3, column=1, padx=(10, 20), pady=(0, 20))
 
         self.keywords_label = tk.Label(self.master, text="Please enter the keywords to avoid:")
         self.keywords_label.grid(row=4, column=0, padx=(20, 10), pady=(0, 5), sticky='w')
@@ -78,6 +75,7 @@ class UpworkAutomationGUI:
             self.pause_flag = False
             self.automation_thread = threading.Thread(target=upwork_automation_script.run_automation, args=(lambda: self.stop_flag, lambda: self.pause_flag, self))
             self.automation_thread.start()
+            self.start_button.config(bg="green")
 
 class TextRedirector(io.TextIOBase):
     def __init__(self, widget):
