@@ -203,13 +203,16 @@ Do not mention attachments, money, or the job title.
             break
         else:
             print("Cover letter too long. Retrying with the same prompt.")
-    message = message.lstrip()
 
+    message = re.sub(r"^(Dear|dear).*\n", "", message, flags=re.IGNORECASE)
+    message = message.lstrip()
+    message = "Hi, \n\n" + message
     paragraphs = message.split('\n\n')
 
-    if len(paragraphs) > 1:
-        paragraphs[1] = chatgpt_mention + paragraphs[1]
+    if len(paragraphs) > 2:
+        paragraphs[2] = chatgpt_mention + paragraphs[2]
         message = '\n\n'.join(paragraphs)
+
 
     return message
 
