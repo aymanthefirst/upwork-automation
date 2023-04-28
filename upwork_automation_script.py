@@ -227,27 +227,33 @@ def run_automation(stop_flag, pause_flag, gui_instance=None):
         while not stop_flag():
             job_count = len(driver.find_elements(By.CLASS_NAME, 'up-card-list-section'))
             for index in range(job_count):
-                keywords_to_avoid = get_keywords_to_avoid()
-                jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
-                job = jobs[index]
-                job = jobs[index]
-                job_title = job.text
-                if gui_instance.skip_matching:
-                    print("Skip matching is enabled. Clicking on the first job title.")
-                    apply(job)
-                    continue
-                budget = re.search(r'Est. Budget: \$([\d,]+)', job_title)
-                if budget and int(budget.group(1).replace(',', '')) < 600:
-                    print("Budget is less than $600. Skipping...")
-                    continue
-                if should_skip_job(job_title, keywords_to_avoid):
-                    continue
-                prompt = f"Rate the relevance of the following job title '{job_title}' to the skills and experience mentioned in this CV: '{skills}'. Please answer in a numerical value and give no more words than the one value."
-                score = get_relevance_score(prompt)
-                if score >= 9 or score >= 9.0:
-                    should_continue = apply(job)
-                    if should_continue:
+                try:
+                    keywords_to_avoid = get_keywords_to_avoid()
+                    jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
+                    job = jobs[index]
+                    job = jobs[index]
+                    job_title = job.text
+                    if gui_instance.skip_matching:
+                        print("Skip matching is enabled. Clicking on the first job title.")
+                        apply(job)
                         continue
+                    budget = re.search(r'Est. Budget: \$([\d,]+)', job_title)
+                    if budget and int(budget.group(1).replace(',', '')) < 600:
+                        print("Budget is less than $600. Skipping...")
+                        continue
+                    if should_skip_job(job_title, keywords_to_avoid):
+                        continue
+                    prompt = f"Rate the relevance of the following job title '{job_title}' to the skills and experience mentioned in this CV: '{skills}'. Please answer in a numerical value and give no more words than the one value."
+                    score = get_relevance_score(prompt)
+                    if score >= 9 or score >= 9.0:
+                        should_continue = apply(job)
+                        if should_continue:
+                            continue
+                except Exception as e:
+                    print(f"Error occurred during job application: {e}")
+                    messagebox.showerror("Error", f"Error occurred during job application: {e}. Please manually submit it, then click ok to continue.")
+                    driver.back()
+                    continue
             click_next_page()
             time.sleep(5)
             jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
