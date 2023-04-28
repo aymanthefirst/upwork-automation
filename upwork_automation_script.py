@@ -9,6 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import re
 from tkinter import messagebox
+import traceback
 
 openai.api_key = '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'
 skills = 'I have 4 years of experience in software development with a focus on Java, python, chatgpt, GPT, artificial intelligence, Spring, Spring Boot, JavaScript, HTML, CSS, Linux, Docker, Kubernetes, Selenium, Git, RESTful APIs, BASH, B2B Implementation, IT Project Solutions, Cross-functional collaboration, Multilingual skills, Project Management, Agile methodologies, Testing, BDD, TDD, Mobile Application Development, and Database Management'
@@ -187,7 +188,7 @@ def generate_cover_letter(job_details):
         {
             "role": "user",
             "content": f"""Please write a concise cover letter with a maximum of 200 words.
-Only mention the skills that I have that are included in the job details.
+Only mention the skills that I have that are included in the job details, and do not mention any other skills that are not in my skillset.
 Write it as Ayman Harake.
 Do not mention attachments, money, or the job title.
 {south_america_mention}.
@@ -208,6 +209,8 @@ Do not mention attachments, money, or the job title.
     message = message.lstrip()
     message = "Hi, \n\n" + message
     paragraphs = message.split('\n\n')
+    paragraphs = [p for p in paragraphs if 'attached' not in p.lower()]
+    message = '\n\n'.join(paragraphs)
 
     if len(paragraphs) > 2:
         paragraphs[2] = chatgpt_mention + paragraphs[2]
@@ -231,7 +234,6 @@ def run_automation(stop_flag, pause_flag, gui_instance=None):
                     keywords_to_avoid = get_keywords_to_avoid()
                     jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
                     job = jobs[index]
-                    job = jobs[index]
                     job_title = job.text
                     if gui_instance.skip_matching:
                         print("Skip matching is enabled. Clicking on the first job title.")
@@ -251,11 +253,15 @@ def run_automation(stop_flag, pause_flag, gui_instance=None):
                             continue
                 except Exception as e:
                     print(f"Error occurred during job application: {e}")
-                    messagebox.showerror("Error", f"Error occurred during job application: {e}. Please manually submit it, then click ok to continue.")
-                    driver.back()
+                    traceback.print_exc()
+                    with open("error.log", "a") as f:
+                        f.write(f"Error occurred during job application: {e}\n")
+                        f.write(f"Job details: {job_title}\n")
+                        f.write(f"Job URL: {driver.current_url}\n\n")
                     continue
             click_next_page()
             time.sleep(5)
             jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
     except Exception as e:
         print(str(e))
+        traceback.print_exc()
