@@ -11,7 +11,7 @@ import re
 from tkinter import messagebox
 
 openai.api_key = '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'
-skills = 'I have 4 years of experience in software development with a focus on Java, Spring, Spring Boot, JavaScript, HTML, CSS, Linux, Docker, Kubernetes, Selenium, Git, RESTful APIs, BASH, B2B Implementation, IT Project Solutions, Cross-functional collaboration, Multilingual skills, Project Management, Agile methodologies, Testing, BDD, TDD, Mobile Application Development, and Database Management'
+skills = 'I have 4 years of experience in software development with a focus on Java, python, chatgpt, GPT, artificial intelligence, Spring, Spring Boot, JavaScript, HTML, CSS, Linux, Docker, Kubernetes, Selenium, Git, RESTful APIs, BASH, B2B Implementation, IT Project Solutions, Cross-functional collaboration, Multilingual skills, Project Management, Agile methodologies, Testing, BDD, TDD, Mobile Application Development, and Database Management'
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 user_data_directory = os.path.join(current_directory, 'upwork_profile')
@@ -173,48 +173,48 @@ def generate_cover_letter(job_details):
     relevant_skills = ", ".join(skills.split(",")).replace("and", "").replace(" ", " ")
     south_america_mention = " Although I am currently based in the UK, I am in the process of moving to Colombia" if "america" in job_details.lower() else ""
     chatgpt_mention = "As you can see from the video that I recently made, the way I applied for this job in itself is a demonstration of my ability to do the job at hand: https://www.youtube.com/watch?v=ImustBIx4NM\n\n" if "chatgpt" in job_details.lower() else ""
-    
-    response = get_gpt_response([
+
+    def generate_message(prompt):
+        response = get_gpt_response(prompt)
+        message = response.choices[0].message.content.strip()
+        return message
+
+    prompt = [
         {
             "role": "system",
             "content": "You are a helpful assistant that writes personalized cover letters for job applications."
         },
         {
             "role": "user",
-            "content": f"""Here is my CV:
-{skills}
-write a 200 word cover letter for the following job post. only mention the skills that I have that are relevant to the job description. do not introduce the message by mentioning the jobtitle or platform. Note that this is for contract jobs and projects, not full-time positions. Write it as Ayman Harake and omit the introduction and signature. Do not start with 'Dear Hiring Manager' or any similar salutation. Do not mention attachments, money, or the job title.{south_america_mention}. Importantly, do not claim that I have experience in anything other than what I have listed here, and make sure to only mention the skills I have listed in my CV: {relevant_skills}. Here are the job details:
-                {job_details}. Do not include an introduction line. Also, do not write a paragraph that summarizes the CV."""  # Add this line here
+            "content": f"""Please write a concise cover letter with a maximum of 200 words.
+Only mention the skills that I have that are included in the job details.
+Write it as Ayman Harake.
+Do not mention attachments, money, or the job title.
+{south_america_mention}.
+ My skills: {skills}
+ job details: {job_details}""" 
         }
-    ])
+    ]
 
-    message = response.choices[0].message.content.strip()
+    while True:
+        message = generate_message(prompt)
 
-    while len(message.split()) > 200:
-        print("Cover letter too long. Retrying with a shorter prompt.")
-        response = get_gpt_response([
-            {
-                "role": "system",
-                "content": "You are a helpful assistant that revises text to fit within a specified character limit."
-            },
-            {
-                "role": "user",
-                "content": f"Cover letter is too long. please remove the least imoprtant paragraph: {message}"
-            }
-        ])
-        message = response.choices[0].message.content.strip()
-
-    message = re.sub(r"^(Dear|dear).*\n", "", message, flags=re.IGNORECASE)
-    message = re.sub(r"I am writing to apply.*?\.\n", "", message, flags=re.IGNORECASE)
+        if len(message.split()) <= 200:
+            break
+        else:
+            print("Cover letter too long. Retrying with the same prompt.")
     message = message.lstrip()
-    message = chatgpt_mention + message
+
+    paragraphs = message.split('\n\n')
+
+    if len(paragraphs) > 1:
+        paragraphs[1] = chatgpt_mention + paragraphs[1]
+        message = '\n\n'.join(paragraphs)
+
     return message
 
-
-
-
 driver.get(
-    "https://www.upwork.com/nx/jobs/search/?q=java&sort=recency&user_location_match=2&duration_v3=months,semester,ongoing&location=Australia%20and%20New%20Zealand,Northern%20America,Northern%20Europe,Southern%20Europe,Western%20Europe")
+    "https://www.upwork.com/nx/jobs/search/?q=gpt&sort=recency&user_location_match=2&duration_v3=months,semester,ongoing&location=Australia%20and%20New%20Zealand,Northern%20America,Northern%20Europe,Southern%20Europe,Western%20Europe")
 
 wait = WebDriverWait(driver, 10)
 wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))

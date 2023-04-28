@@ -11,7 +11,6 @@ class UpworkAutomationGUI:
         self.master = master
         self.master.title("Upwork Automation")
 
-        # Add some labels to provide context
         self.start_label = tk.Label(self.master, text="Please login to upwork and navigate and create a search for jobs. Then click start to begin the automation.")
         self.start_label.grid(row=0, column=0, columnspan=2, pady=(10, 5))
 
@@ -22,13 +21,13 @@ class UpworkAutomationGUI:
         self.stop_flag = False
         self.pause_flag = False
 
+        upwork_automation_script.prompt_on_close = True
+
         self.skip_matching = False
 
-        # Add a Text widget to display console logs
         self.console_log = tk.Text(self.master, wrap=tk.WORD, height=10)
         self.console_log.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
-        # Redirect standard output to the Text widget
         sys.stdout = TextRedirector(self.console_log)
 
         def toggle_skip_matching():
@@ -38,7 +37,7 @@ class UpworkAutomationGUI:
                 skip_matching_button.configure(bg="green", text="Skip Matching: ON")
             else:
                 skip_matching_button.configure(bg="red", text="Skip Matching: OFF")
-        
+
         def toggle_prompt_on_close():
             upwork_automation_script.prompt_on_close = not upwork_automation_script.prompt_on_close
             if upwork_automation_script.prompt_on_close:
@@ -46,8 +45,8 @@ class UpworkAutomationGUI:
             else:
                 self.prompt_on_close_button.configure(bg="red", text="Prompt before exiting tab: OFF")
 
-        self.prompt_on_close_button = tk.Button(self.master, text="Prompt before exiting tab: OFF", command=toggle_prompt_on_close)
-        self.prompt_on_close_button.configure(bg="red")
+        self.prompt_on_close_button = tk.Button(self.master, text="Prompt before exiting tab: ON", command=toggle_prompt_on_close)
+        self.prompt_on_close_button.configure(bg="green")
         self.prompt_on_close_button.grid(row=3, column=0, padx=(20, 10), pady=(0, 20))
 
         skip_matching_button = tkinter.Button(text="AI Matching: OFF", command=toggle_skip_matching, bg="red")
@@ -57,6 +56,7 @@ class UpworkAutomationGUI:
         self.keywords_label.grid(row=4, column=0, padx=(20, 10), pady=(0, 5), sticky='w')
 
         self.keywords_entry = tk.Entry(self.master, width=60)
+        self.keywords_entry.insert(0, "applied")
         self.keywords_entry.grid(row=4, column=1, padx=(0, 10), pady=(0, 20), sticky='w')
 
         def save_keywords():
@@ -65,10 +65,10 @@ class UpworkAutomationGUI:
                 file.write(keywords)
             print("Keywords saved:", keywords)
 
-
         self.save_button = tk.Button(self.master, text="Save", command=save_keywords, padx=10, pady=5, bg="#007bff", fg="white")
         self.save_button.grid(row=4, column=2, padx=(0, 20), pady=(0, 20), sticky='w')
 
+        save_keywords()
 
     def start_automation(self):
         if not self.automation_thread or not self.automation_thread.is_alive():
@@ -99,3 +99,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
