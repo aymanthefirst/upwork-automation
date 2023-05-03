@@ -10,6 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import re
 from tkinter import messagebox
 import traceback
+import pygame
 
 openai.api_key = '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'
 skills = 'I have 4 years of experience in software development with a focus on Java, python, chatgpt, GPT, artificial intelligence, Spring, Spring Boot, JavaScript, HTML, CSS, Linux, Docker, Kubernetes, Selenium, Git, RESTful APIs, BASH, B2B Implementation, IT Project Solutions, Cross-functional collaboration, Multilingual skills, Project Management, Agile methodologies, Testing, BDD, TDD, Mobile Application Development, and Database Management'
@@ -38,7 +39,8 @@ def close_with_prompt(ask_continue=None):
     global prompt_on_close
     if ask_continue is None:
         ask_continue = prompt_on_close
-    if ask_continue:
+        sound_file = 'chime.wav'
+        play_sound(sound_file)
         user_choice = messagebox.askyesno("Submit Application?", "Do you want to submit the application?")
         if user_choice:
             submit_button = driver.find_element(By.XPATH, "//button[contains(., 'send') or contains(., 'Send')]")
@@ -53,6 +55,14 @@ def close_with_prompt(ask_continue=None):
     driver.close()
     driver.switch_to.window(driver.window_handles[0])
     driver.back()
+
+def play_sound(file_path):
+    pygame.mixer.init()
+    pygame.mixer.music.load(file_path)
+    pygame.mixer.music.play()
+    while pygame.mixer.music.get_busy():
+        pygame.time.Clock().tick(10)
+
 
 def close():
     driver.close()
@@ -220,7 +230,7 @@ Do not mention attachments, money, or the job title.
     return message
 
 driver.get(
-    "https://www.upwork.com/nx/jobs/search/?q=gpt&sort=recency&user_location_match=2&duration_v3=months,semester,ongoing&location=Australia%20and%20New%20Zealand,Northern%20America,Northern%20Europe,Southern%20Europe,Western%20Europe")
+    "https://www.upwork.com/nx/jobs/search/?q=gpt&sort=recency&user_location_match=2&duration_v3=months,semester,ongoing&location=Australia%20and%20New%20Zealand,Northern%20America,Northern%20Europe,Southern%20Europe,Western%20Europe?page=5")
 
 wait = WebDriverWait(driver, 10)
 wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
