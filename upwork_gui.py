@@ -80,6 +80,10 @@ class UpworkAutomationGUI:
 
         save_keywords()
 
+    def update_tokens_used(self, count):
+        self.tokens_used.set(count)
+
+
     def start_automation(self):
         if not self.automation_thread or not self.automation_thread.is_alive():
             self.start_label.grid_remove()

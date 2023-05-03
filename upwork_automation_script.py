@@ -11,6 +11,7 @@ import re
 from tkinter import messagebox
 import traceback
 import pygame
+import upwork_gui
 
 openai.api_key = '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'
 skills = 'I have 4 years of experience in software development with a focus on Java, python, chatgpt, GPT, artificial intelligence, Spring, Spring Boot, JavaScript, HTML, CSS, Linux, Docker, Kubernetes, Selenium, Git, RESTful APIs, BASH, B2B Implementation, IT Project Solutions, Cross-functional collaboration, Multilingual skills, Project Management, Agile methodologies, Testing, BDD, TDD, Mobile Application Development, and Database Management'
@@ -236,10 +237,13 @@ wait = WebDriverWait(driver, 10)
 wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
 
 def run_automation(stop_flag, pause_flag, gui_instance=None):
+    token_counter = 0
     try:
         while not stop_flag():
             job_count = len(driver.find_elements(By.CLASS_NAME, 'up-card-list-section'))
             for index in range(job_count):
+                token_counter += 1
+                gui_instance.update_tokens_used(token_counter)
                 try:
                     keywords_to_avoid = get_keywords_to_avoid()
                     jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
