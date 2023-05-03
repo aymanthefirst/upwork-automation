@@ -30,6 +30,16 @@ class UpworkAutomationGUI:
 
         sys.stdout = TextRedirector(self.console_log)
 
+        self.tokens_used = tk.IntVar()
+        self.tokens_used.set(0)
+        self.tokens_used_label = tk.Label(self.master, text="Tokens used:")
+        self.tokens_used_label.grid(
+            row=5, column=0, padx=(20, 10), pady=(0, 5), sticky='w')
+        self.tokens_used_value_label = tk.Label(
+            self.master, textvariable=self.tokens_used)
+        self.tokens_used_value_label.grid(
+            row=5, column=1, padx=(0, 10), pady=(0, 20), sticky='w')
+
         def toggle_skip_matching():
             self.skip_matching = not self.skip_matching
             print(f"Skip matching: {self.skip_matching}")
