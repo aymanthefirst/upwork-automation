@@ -75,7 +75,8 @@ def get_keywords_to_avoid():
         keywords = file.read()
     return keywords.split(',')
 
-def apply(job):
+
+def apply(job, gui_instance):
     wait = WebDriverWait(driver, 10) 
     job.click()
     print("Clicked on job title")
@@ -114,7 +115,7 @@ def apply(job):
         close()
         return True
     job_details = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'fe-job-details'))).text
-    textbox.send_keys(generate_cover_letter(job_details))
+    textbox.send_keys(generate_cover_letter(job_details, gui_instance))
     time.sleep(5)
     close_with_prompt()
     print("Navigated back to job search results")
@@ -141,7 +142,8 @@ def should_skip_job(job_title, keywords_to_avoid):
     return False
 
 
-def get_gpt_response(messages):
+def get_gpt_response(messages, gui_instance=None):
+    global token_counter
     retries = 5
     while retries > 0:
         try:
@@ -150,18 +152,25 @@ def get_gpt_response(messages):
                 messages=messages,
                 timeout=60
             )
+            token_counter += response['usage']['total_tokens']
+            if gui_instance:
+                gui_instance.update_tokens_used(token_counter)
             return response
         except openai.error.RateLimitError as e:
-            wait_seconds = int(re.search(r"Please try again in (\d+)s", str(e)).group(1))
-            print(f"Rate limit reached. Waiting for {wait_seconds} seconds before retrying.")
+            wait_seconds = int(
+                re.search(r"Please try again in (\d+)s", str(e)).group(1))
+            print(
+                f"Rate limit reached. Waiting for {wait_seconds} seconds before retrying.")
             time.sleep(wait_seconds + 1)
         except openai.error.OpenAIError as e:
             print(f"OpenAI Error occurred: {e}")
             retries -= 1
             time.sleep(5)
-    raise Exception("Unable to get a response from GPT-3.5-turbo after multiple retries.")
+    raise Exception(
+        "Unable to get a response from GPT-3.5-turbo after multiple retries.")
 
-def get_relevance_score(prompt):
+
+def get_relevance_score(prompt, gui_instance=None):
     response = get_gpt_response([
         {
             "role": "system",
@@ -171,7 +180,7 @@ def get_relevance_score(prompt):
             "role": "user",
             "content": prompt
         }
-    ])
+    ], gui_instance)  # Pass the gui_instance to the get_gpt_response function
     response_text = response['choices'][0]['message']['content'].strip()
     score = re.search(r'\d+(\.\d+)?', response_text)
     print("score:", score.group() if score else None)
@@ -181,13 +190,15 @@ def get_relevance_score(prompt):
         print("No numerical value found in the response.")
         return None
 
-def generate_cover_letter(job_details):
-    relevant_skills = ", ".join(skills.split(",")).replace("and", "").replace(" ", " ")
+
+def generate_cover_letter(job_details, gui_instance=None):
+    relevant_skills = ", ".join(skills.split(",")).replace(
+        "and", "").replace(" ", " ")
     south_america_mention = " Although I am currently based in the UK, I am in the process of moving to Colombia" if "america" in job_details.lower() else ""
     chatgpt_mention = "As you can see from the video that I recently made, the way I applied for this job in itself is a demonstration of my ability to do the job at hand: https://www.youtube.com/watch?v=ImustBIx4NM\n\n" if "chatgpt" in job_details.lower() else ""
 
-    def generate_message(prompt):
-        response = get_gpt_response(prompt)
+    def generate_message(prompt, gui_instance=None):
+        response = get_gpt_response(prompt, gui_instance)
         message = response.choices[0].message.content.strip()
         return message
 
@@ -209,7 +220,7 @@ Do not mention attachments, money, or the job title.
     ]
 
     while True:
-        message = generate_message(prompt)
+        message = generate_message(prompt, gui_instance)
 
         if len(message.split()) <= 200:
             break
@@ -237,12 +248,12 @@ wait = WebDriverWait(driver, 10)
 wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
 
 def run_automation(stop_flag, pause_flag, gui_instance=None):
+    global token_counter
     token_counter = 0
     try:
         while not stop_flag():
             job_count = len(driver.find_elements(By.CLASS_NAME, 'up-card-list-section'))
             for index in range(job_count):
-                token_counter += 1
                 gui_instance.update_tokens_used(token_counter)
                 try:
                     keywords_to_avoid = get_keywords_to_avoid()
@@ -251,7 +262,7 @@ def run_automation(stop_flag, pause_flag, gui_instance=None):
                     job_title = job.text
                     if gui_instance.skip_matching:
                         print("Skip matching is enabled. Clicking on the first job title.")
-                        apply(job)
+                        apply(job, gui_instance)
                         continue
                     budget = re.search(r'Est. Budget: \$([\d,]+)', job_title)
                     if budget and int(budget.group(1).replace(',', '')) < 600:
@@ -260,9 +271,9 @@ def run_automation(stop_flag, pause_flag, gui_instance=None):
                     if should_skip_job(job_title, keywords_to_avoid):
                         continue
                     prompt = f"Rate the relevance of the following job title '{job_title}' to the skills and experience mentioned in this CV: '{skills}'. Please answer in a numerical value and give no more words than the one value."
-                    score = get_relevance_score(prompt)
+                    score = get_relevance_score(prompt, gui_instance=gui_instance)
                     if score >= 9 or score >= 9.0:
-                        should_continue = apply(job)
+                        should_continue = apply(job, gui_instance)
                         if should_continue:
                             continue
                 except Exception as e:
