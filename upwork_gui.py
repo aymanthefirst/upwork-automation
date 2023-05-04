@@ -39,6 +39,16 @@ class UpworkAutomationGUI:
             self.master, textvariable=self.tokens_used)
         self.tokens_used_value_label.grid(
             row=5, column=1, padx=(0, 10), pady=(0, 20), sticky='w')
+        
+        self.price_label = tk.Label(self.master, text="Price:")
+        self.price_label.grid(
+            row=6, column=0, padx=(20, 10), pady=(0, 5), sticky='w')
+        self.price = tk.StringVar()
+        self.price.set("$0")
+        self.price_value_label = tk.Label(
+            self.master, textvariable=self.price)
+        self.price_value_label.grid(
+            row=6, column=1, padx=(0, 10), pady=(0, 20), sticky='w')
 
         def toggle_skip_matching():
             self.skip_matching = not self.skip_matching
@@ -82,6 +92,9 @@ class UpworkAutomationGUI:
 
     def update_tokens_used(self, count):
         self.tokens_used.set(count)
+        price_per_token = 0.002 / 1000
+        price = count * price_per_token
+        self.price.set(f"${price:.4f}")
 
 
     def start_automation(self):
