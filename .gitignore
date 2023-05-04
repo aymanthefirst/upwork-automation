@@ -5,3 +5,4 @@ upwork_profile/
 keywords_to_avoid.txt
 *.pyc
 __pycache__/
+*.log
