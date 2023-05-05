@@ -96,10 +96,8 @@ class UpworkAutomationGUI:
             self.application_limit = int(self.application_limit_spinbox.get())
             print("Application limit saved:", self.application_limit)
 
-        self.save_button = tk.Button(
-            self.master, text="Save", command=save_keywords_and_limit, padx=10, pady=5, bg="#007bff", fg="white")
-        self.save_button.grid(row=6, column=0, padx=(20, 10), pady=(
-            0, 20), sticky='w')  # Lowered the save button
+        self.save_button = tk.Button(self.master, text="Save", command=save_keywords_and_limit, padx=10, pady=5, bg="#007bff", fg="white")
+        self.save_button.grid(row=7, column=2, padx=(0, 20), pady=(0, 20), sticky='se')
 
     def update_tokens_used(self, count):
         self.tokens_used.set(count)
