@@ -36,7 +36,7 @@ driver.execute_cdp_cmd("Page.setGeolocationOverride", params)
 
 skip_matching = False
 prompt_on_close = False
-def close_with_prompt(ask_continue=None):
+def close_with_prompt(ask_continue=None, gui_instance=None):
     global prompt_on_close
     if ask_continue is None:
         ask_continue = prompt_on_close
@@ -46,6 +46,7 @@ def close_with_prompt(ask_continue=None):
         if user_choice:
             submit_button = driver.find_element(By.XPATH, "//button[contains(., 'send') or contains(., 'Send')]")
             submit_button.click()
+            gui_instance.add_one_submit()
             try:
                 WebDriverWait(driver, 10).until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'Your proposal was submitted.'))
             except:
@@ -117,7 +118,7 @@ def apply(job, gui_instance):
     job_details = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'fe-job-details'))).text
     textbox.send_keys(generate_cover_letter(job_details, gui_instance))
     time.sleep(5)
-    close_with_prompt()
+    close_with_prompt(gui_instance=gui_instance)
     print("Navigated back to job search results")
     wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
 
@@ -240,7 +241,7 @@ def generate_cover_letter(job_details, gui_instance=None):
 
 
 driver.get(
-    "https://www.upwork.com/nx/jobs/search/?q=gpt&sort=recency&user_location_match=2&duration_v3=months,semester,ongoing&location=Australia%20and%20New%20Zealand,Northern%20America,Northern%20Europe,Southern%20Europe,Western%20Europe?page=5")
+    "https://www.upwork.com/nx/jobs/search/?q=gpt&sort=recency&user_location_match=2&duration_v3=months,semester,ongoing&location=Australia%20and%20New%20Zealand,Northern%20America,Northern%20Europe,Southern%20Europe&page=3")
 
 wait = WebDriverWait(driver, 10)
 wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))

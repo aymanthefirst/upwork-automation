@@ -49,6 +49,16 @@ class UpworkAutomationGUI:
             self.master, textvariable=self.price)
         self.price_value_label.grid(
             row=6, column=1, padx=(0, 10), pady=(0, 20), sticky='w')
+        
+        self.number_of_submits_label = tk.Label(self.master, text="Number of submits:")
+        self.number_of_submits_label.grid(
+            row=7, column=0, padx=(20, 10), pady=(0, 5), sticky='w')
+        self.number_of_submits = tk.IntVar()
+        self.number_of_submits.set(0)
+        self.number_of_submits_value_label = tk.Label(
+            self.master, textvariable=self.number_of_submits)
+        self.number_of_submits_value_label.grid(
+            row=7, column=1, padx=(0, 10), pady=(0, 20), sticky='w')
 
         def toggle_skip_matching():
             self.skip_matching = not self.skip_matching
@@ -96,6 +106,8 @@ class UpworkAutomationGUI:
         price = count * price_per_token
         self.price.set(f"${price:.4f}")
 
+    def add_one_submit(self):
+        self.number_of_submits.set(self.number_of_submits.get() + 1)
 
     def start_automation(self):
         if not self.automation_thread or not self.automation_thread.is_alive():
