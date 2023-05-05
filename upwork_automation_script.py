@@ -34,6 +34,13 @@ params = {
 }
 driver.execute_cdp_cmd("Page.setGeolocationOverride", params)
 
+
+def save_cover_letter_to_file(cover_letter):
+    with open("cover_letters.txt", "a") as file:
+        file.write("Cover Letter:\n")
+        file.write(cover_letter)
+        file.write("\n\n---\n\n")
+
 prompt_on_close = False
 def close_with_prompt(ask_continue=None, gui_instance=None):
     global prompt_on_close
@@ -235,12 +242,13 @@ def generate_cover_letter(job_details, gui_instance=None):
         paragraphs[2] = additional_mentions + paragraphs[2]
         message = '\n\n'.join(paragraphs)
 
+    save_cover_letter_to_file(message)
     return message
 
 
 
 driver.get(
-    "https://www.upwork.com/nx/jobs/search/?q=gpt&sort=recency&user_location_match=2&duration_v3=months,semester,ongoing&location=Australia%20and%20New%20Zealand,Northern%20America,Northern%20Europe,Southern%20Europe&page=3")
+    "https://www.upwork.com/nx/jobs/search/?q=gpt&sort=recency&user_location_match=2&duration_v3=months,semester,ongoing&location=Australia%20and%20New%20Zealand,Northern%20America,Northern%20Europe,Southern%20Europe")
 
 wait = WebDriverWait(driver, 10)
 wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
