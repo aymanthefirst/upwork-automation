@@ -2,6 +2,7 @@
 .idea/
 .git/
 upwork_profile/
+previous_sessions/
 keywords_to_avoid.txt
 *.pyc
 __pycache__/
