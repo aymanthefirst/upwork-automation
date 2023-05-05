@@ -105,6 +105,8 @@ class UpworkAutomationGUI:
             self.automation_thread = threading.Thread(target=upwork_automation_script.run_automation, args=(lambda: self.stop_flag, lambda: self.pause_flag, self))
             self.automation_thread.start()
             self.start_button.config(bg="green")
+            self.start_button.grid_remove()
+
 
 class TextRedirector(io.TextIOBase):
     def __init__(self, widget):
