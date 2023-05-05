@@ -278,17 +278,26 @@ driver.get(
 wait = WebDriverWait(driver, 10)
 wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
 
+
 def run_automation(stop_flag, pause_flag, gui_instance=None):
     global token_counter
     token_counter = 0
+    applied_count = 0
+    application_limit = 10
+
+    if gui_instance is not None:
+        application_limit = gui_instance.application_limit
+
     try:
         while not stop_flag():
-            job_count = len(driver.find_elements(By.CLASS_NAME, 'up-card-list-section'))
+            job_count = len(driver.find_elements(
+                By.CLASS_NAME, 'up-card-list-section'))
             for index in range(job_count):
                 gui_instance.update_tokens_used(token_counter)
                 try:
                     keywords_to_avoid = get_keywords_to_avoid()
-                    jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
+                    jobs = driver.find_elements(
+                        By.CLASS_NAME, 'up-card-list-section')
                     job = jobs[index]
                     job_title = job.text
                     budget = re.search(r'Est. Budget: \$([\d,]+)', job_title)
@@ -298,16 +307,23 @@ def run_automation(stop_flag, pause_flag, gui_instance=None):
                     if should_skip_job(job_title, keywords_to_avoid):
                         continue
                     prompt = f"Rate the relevance of the following job title '{job_title}' to the skills and experience mentioned in this CV: '{skills}'. Please answer in a numerical value and give no more words than the one value."
-                    score = get_relevance_score(prompt, gui_instance=gui_instance)
+                    score = get_relevance_score(
+                        prompt, gui_instance=gui_instance)
                     if score >= 9 or score >= 9.0:
                         should_continue = apply(job, gui_instance)
                         if should_continue:
                             continue
+                        applied_count += 1
+                        if applied_count >= application_limit:
+                            print(
+                                f"Application limit of {application_limit} reached.")
+                            return
                 except Exception as e:
                     print(f"Error occurred during job application: {e}")
                     traceback.print_exc()
                     with open("error.log", "a") as f:
-                        f.write(f"Error occurred during job application: {e}\n")
+                        f.write(
+                            f"Error occurred during job application: {e}\n")
                         f.write(f"Job details: {job_title}\n")
                         f.write(f"Job URL: {driver.current_url}\n\n")
                     continue

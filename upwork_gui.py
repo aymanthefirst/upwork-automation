@@ -86,13 +86,13 @@ class UpworkAutomationGUI:
         self.application_limit_spinbox.grid(
             row=5, column=1, padx=(0, 10), pady=(0, 20), sticky='w')
 
+        self.application_limit = 10
         def save_keywords_and_limit():
             keywords = self.keywords_entry.get()
             with open("keywords_to_avoid.txt", "w") as file:
                 file.write(keywords)
             print("Keywords saved:", keywords)
 
-            # Save the application limit value
             self.application_limit = int(self.application_limit_spinbox.get())
             print("Application limit saved:", self.application_limit)
 
