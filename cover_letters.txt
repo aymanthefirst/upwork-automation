@@ -1,0 +1,20 @@
+git rm --cached cover_letters.txtCover Letter:
+Hi, 
+
+I am writing in response to your job posting for a prompt engineer with experience in Openai chat Gpt4 prompter and machine learning. As an experienced software developer with a strong focus on Java, Python, Chatgpt, GPT, and artificial intelligence, I believe I am a great fit for this role.
+
+As you can see from the video that I recently made, the way I applied for this job in itself is a demonstration of my ability to do the job at hand: https://www.youtube.com/watch?v=ImustBIx4NM
+
+With four years of experience in software development, I have gained extensive knowledge of Spring, Spring Boot, JavaScript, HTML, CSS, Linux, Docker, Kubernetes, Selenium, Git, RESTful APIs, BASH, B2B Implementation, IT Project Solutions, Cross-functional collaboration, Multilingual skills, Project Management, Agile methodologies, Testing, BDD, TDD, Mobile Application Development, and Database Management. 
+
+Your job posting particularly caught my attention due to my keen interest in natural language processing. I have good knowledge of Python, which is the recommended language for Openai, and various Python libraries for natural language processing.
+
+I would welcome the opportunity to further discuss my skills and qualifications with you and to learn more about your needs for this position. Please let me know if you require any further information or documentation from me.
+
+Thank you for considering my application.
+
+Best regards,
+Ayman Harake
+
+---
+
