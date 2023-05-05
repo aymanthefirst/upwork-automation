@@ -75,6 +75,18 @@ class UpworkAutomationGUI:
         self.keywords_entry.insert(0, "applied")
         self.keywords_entry.grid(row=4, column=1, padx=(0, 10), pady=(0, 20), sticky='w')
 
+        self.application_limit_label = tk.Label(
+            self.master, text="Application limit:")
+        self.application_limit_label.grid(
+            row=5, column=0, padx=(20, 10), pady=(0, 5), sticky='w')
+        self.application_limit_spinbox = tk.Spinbox(
+            self.master, from_=1, to=1000, width=10) 
+        self.application_limit_spinbox.delete(0, 'end')
+        self.application_limit_spinbox.insert(
+            0, "10")  # Set the default value to 10
+        self.application_limit_spinbox.grid(
+            row=5, column=1, padx=(0, 10), pady=(0, 20), sticky='w')
+
         def save_keywords():
             keywords = self.keywords_entry.get()
             with open("keywords_to_avoid.txt", "w") as file:
