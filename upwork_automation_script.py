@@ -12,6 +12,8 @@ from tkinter import messagebox
 import traceback
 import pygame
 import upwork_gui
+import datetime
+import os
 
 openai.api_key = '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'
 skills = 'I have 4 years of experience in software development with a focus on Java, python, chatgpt, GPT, artificial intelligence, Spring, Spring Boot, JavaScript, HTML, CSS, Linux, Docker, Kubernetes, Selenium, Git, RESTful APIs, BASH, B2B Implementation, IT Project Solutions, Cross-functional collaboration, Multilingual skills, Project Management, Agile methodologies, Testing, BDD, TDD, Mobile Application Development, and Database Management'
@@ -34,9 +36,24 @@ params = {
 }
 driver.execute_cdp_cmd("Page.setGeolocationOverride", params)
 
+current_session_file_name = None
+def save_cover_letter_to_file(job_title, cover_letter):
+    global current_session_file_name
 
-def save_cover_letter_to_file(cover_letter):
-    with open("cover_letters.txt", "a") as file:
+    previous_sessions_folder = "previous_sessions"
+    if not os.path.exists(previous_sessions_folder):
+        os.makedirs(previous_sessions_folder)
+
+    if current_session_file_name is None:
+        current_session_file_name = f"cover_letters_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.txt"
+
+    file_path = os.path.join(previous_sessions_folder,
+                             current_session_file_name)
+
+    with open(file_path, "a") as file:
+        file.write(f"Job Title: {job_title}\n")
+        file.write(
+            f"Date and Time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
         file.write("Cover Letter:\n")
         file.write(cover_letter)
         file.write("\n\n---\n\n")
@@ -212,7 +229,7 @@ def generate_cover_letter(job_details, gui_instance=None):
         message = response.choices[0].message.content.strip()
         return message
 
-    south_america_mention = " Although I am currently based in the UK, I am in the process of moving to Colombia" if "south america" in job_details.lower() else ""
+    south_america_mention = " Although I am currently based in the UK, I am in the process of moving to Colombia" if "america" in job_details.lower() else ""
     chatgpt_mention = "As you can see from the video that I recently made, the way I applied for this job in itself is a demonstration of my ability to do the job at hand: https://www.youtube.com/watch?v=ImustBIx4NM\n\n" if "gpt" in job_details.lower() else ""
 
     prompt = [
@@ -250,7 +267,7 @@ def generate_cover_letter(job_details, gui_instance=None):
         paragraphs[2] = additional_mentions + paragraphs[2]
         message = '\n\n'.join(paragraphs)
 
-    save_cover_letter_to_file(message)
+    save_cover_letter_to_file(job_details,message)
     return message
 
 
