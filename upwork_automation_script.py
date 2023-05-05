@@ -34,7 +34,6 @@ params = {
 }
 driver.execute_cdp_cmd("Page.setGeolocationOverride", params)
 
-skip_matching = False
 prompt_on_close = False
 def close_with_prompt(ask_continue=None, gui_instance=None):
     global prompt_on_close
@@ -212,7 +211,7 @@ def generate_cover_letter(job_details, gui_instance=None):
             Write a professional and effective cover letter as Ayman Harake, using provided information about the job and my skills and experience. Tailor the letter to the specific job and company, highlighting my qualifications and explaining why I am a strong fit. Use appropriate formatting and layout. Keep the content clear, concise, and free of personal opinions, while focusing on industry standards.
             My skills:
             {skills}
-            
+
             Job details:
             {job_details}"""
         }
@@ -261,10 +260,6 @@ def run_automation(stop_flag, pause_flag, gui_instance=None):
                     jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
                     job = jobs[index]
                     job_title = job.text
-                    if gui_instance.skip_matching:
-                        print("Skip matching is enabled. Clicking on the first job title.")
-                        apply(job, gui_instance)
-                        continue
                     budget = re.search(r'Est. Budget: \$([\d,]+)', job_title)
                     if budget and int(budget.group(1).replace(',', '')) < 600:
                         print("Budget is less than $600. Skipping...")

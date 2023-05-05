@@ -23,8 +23,6 @@ class UpworkAutomationGUI:
 
         upwork_automation_script.prompt_on_close = True
 
-        self.skip_matching = False
-
         self.console_log = tk.Text(self.master, wrap=tk.WORD, height=10)
         self.console_log.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
@@ -60,14 +58,6 @@ class UpworkAutomationGUI:
         self.number_of_submits_value_label.grid(
             row=7, column=1, padx=(0, 10), pady=(0, 20), sticky='w')
 
-        def toggle_skip_matching():
-            self.skip_matching = not self.skip_matching
-            print(f"Skip matching: {self.skip_matching}")
-            if self.skip_matching:
-                skip_matching_button.configure(bg="green", text="Skip Matching: ON")
-            else:
-                skip_matching_button.configure(bg="red", text="Skip Matching: OFF")
-
         def toggle_prompt_on_close():
             upwork_automation_script.prompt_on_close = not upwork_automation_script.prompt_on_close
             if upwork_automation_script.prompt_on_close:
@@ -78,9 +68,6 @@ class UpworkAutomationGUI:
         self.prompt_on_close_button = tk.Button(self.master, text="Prompt before exiting tab: ON", command=toggle_prompt_on_close)
         self.prompt_on_close_button.configure(bg="green")
         self.prompt_on_close_button.grid(row=3, column=0, padx=(20, 10), pady=(0, 20))
-
-        skip_matching_button = tkinter.Button(text="AI Matching: OFF", command=toggle_skip_matching, bg="red")
-        skip_matching_button.grid(row=3, column=1, padx=(10, 20), pady=(0, 20))
 
         self.keywords_label = tk.Label(self.master, text="Please enter the keywords to avoid:")
         self.keywords_label.grid(row=4, column=0, padx=(20, 10), pady=(0, 5), sticky='w')
