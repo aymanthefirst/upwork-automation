@@ -192,15 +192,13 @@ def get_relevance_score(prompt, gui_instance=None):
 
 
 def generate_cover_letter(job_details, gui_instance=None):
-    relevant_skills = ", ".join(skills.split(",")).replace(
-        "and", "").replace(" ", " ")
-    south_america_mention = " Although I am currently based in the UK, I am in the process of moving to Colombia" if "america" in job_details.lower() else ""
-    chatgpt_mention = "As you can see from the video that I recently made, the way I applied for this job in itself is a demonstration of my ability to do the job at hand: https://www.youtube.com/watch?v=ImustBIx4NM\n\n" if "chatgpt" in job_details.lower() else ""
-
     def generate_message(prompt, gui_instance=None):
         response = get_gpt_response(prompt, gui_instance)
         message = response.choices[0].message.content.strip()
         return message
+
+    south_america_mention = " Although I am currently based in the UK, I am in the process of moving to Colombia" if "south america" in job_details.lower() else ""
+    chatgpt_mention = "As you can see from the video that I recently made, the way I applied for this job in itself is a demonstration of my ability to do the job at hand: https://www.youtube.com/watch?v=ImustBIx4NM\n\n" if "gpt" in job_details.lower() else ""
 
     prompt = [
         {
@@ -210,12 +208,10 @@ def generate_cover_letter(job_details, gui_instance=None):
         {
             "role": "user",
             "content": f"""Please write a concise cover letter with a maximum of 200 words.
-Only mention the skills that I have that are included in the job details, and do not mention any other skills that are not in my skillset.
-Write it as Ayman Harake.
-Do not mention attachments, money, or the job title.
-{south_america_mention}.
- My skills: {skills}
- job details: {job_details}""" 
+            Write it as Ayman Harake.
+            Do not mention attachments, money, or the job title.
+            My skills: {skills}
+            job details: {job_details}"""
         }
     ]
 
@@ -235,11 +231,13 @@ Do not mention attachments, money, or the job title.
     message = '\n\n'.join(paragraphs)
 
     if len(paragraphs) > 2:
-        paragraphs[2] = chatgpt_mention + paragraphs[2]
+        additional_mentions = chatgpt_mention + south_america_mention
+        paragraphs[2] = additional_mentions + paragraphs[2]
         message = '\n\n'.join(paragraphs)
 
-
     return message
+
+
 
 driver.get(
     "https://www.upwork.com/nx/jobs/search/?q=gpt&sort=recency&user_location_match=2&duration_v3=months,semester,ongoing&location=Australia%20and%20New%20Zealand,Northern%20America,Northern%20Europe,Southern%20Europe,Western%20Europe?page=5")
