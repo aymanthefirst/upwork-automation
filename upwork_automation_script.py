@@ -209,10 +209,12 @@ def generate_cover_letter(job_details, gui_instance=None):
         {
             "role": "user",
             "content": f"""Please write a concise cover letter with a maximum of 200 words.
-            Write it as Ayman Harake.
-            Do not mention attachments, money, or the job title.
-            My skills: {skills}
-            job details: {job_details}"""
+            Write a professional and effective cover letter as Ayman Harake, using provided information about the job and my skills and experience. Tailor the letter to the specific job and company, highlighting my qualifications and explaining why I am a strong fit. Use appropriate formatting and layout. Keep the content clear, concise, and free of personal opinions, while focusing on industry standards.
+            My skills:
+            {skills}
+            
+            Job details:
+            {job_details}"""
         }
     ]
 
