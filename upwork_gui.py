@@ -63,7 +63,8 @@ class UpworkAutomationGUI:
             if upwork_automation_script.prompt_on_close:
                 self.prompt_on_close_button.configure(bg="green", text="Prompt before exiting tab: ON")
             else:
-                self.prompt_on_close_button.configure(bg="blue", text="Prompt before exiting tab: OFF")
+                self.prompt_on_close_button.configure(
+                    bg="#007bff", fg="white", text="Prompt before exiting tab: OFF")
 
         self.prompt_on_close_button = tk.Button(self.master, text="Prompt before exiting tab: ON", command=toggle_prompt_on_close)
         self.prompt_on_close_button.configure(bg="green")
