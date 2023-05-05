@@ -44,25 +44,33 @@ def save_cover_letter_to_file(cover_letter):
 prompt_on_close = False
 def close_with_prompt(ask_continue=None, gui_instance=None):
     global prompt_on_close
-    if ask_continue is None:
-        ask_continue = prompt_on_close
+
+    if prompt_on_close:  # Check if prompt_on_close is True
         sound_file = 'chime.wav'
         play_sound(sound_file)
-        user_choice = messagebox.askyesno("Submit Application?", "Do you want to submit the application?")
-        if user_choice:
-            submit_button = driver.find_element(By.XPATH, "//button[contains(., 'send') or contains(., 'Send')]")
-            submit_button.click()
-            gui_instance.add_one_submit()
-            try:
-                WebDriverWait(driver, 10).until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'Your proposal was submitted.'))
-            except:
-                print('Error in submitting application. Skipping...')
-                messagebox.showerror("Error", "Error in submitting application. Please manually submit it, then click ok to continue.")
-                close()
-                return True
+        user_choice = messagebox.askyesno(
+            "Submit Application?", "Do you want to submit the application?")
+    else:
+        user_choice = True  # Skip the prompt and assume the user wants to submit the application
+
+    if user_choice:
+        submit_button = driver.find_element(
+            By.XPATH, "//button[contains(., 'send') or contains(., 'Send')]")
+        submit_button.click()
+        gui_instance.add_one_submit()
+        try:
+            WebDriverWait(driver, 10).until(EC.text_to_be_present_in_element(
+                (By.TAG_NAME, 'body'), 'Your proposal was submitted.'))
+        except:
+            print('Error in submitting application. Skipping...')
+            messagebox.showerror(
+                "Error", "Error in submitting application. Please manually submit it, then click ok to continue.")
+            close()
+            return True
     driver.close()
     driver.switch_to.window(driver.window_handles[0])
     driver.back()
+
 
 def play_sound(file_path):
     pygame.mixer.init()

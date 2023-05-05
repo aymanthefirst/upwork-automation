@@ -21,8 +21,6 @@ class UpworkAutomationGUI:
         self.stop_flag = False
         self.pause_flag = False
 
-        upwork_automation_script.prompt_on_close = True
-
         self.console_log = tk.Text(self.master, wrap=tk.WORD, height=10)
         self.console_log.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
@@ -58,6 +56,7 @@ class UpworkAutomationGUI:
         self.number_of_submits_value_label.grid(
             row=7, column=1, padx=(0, 10), pady=(0, 20), sticky='w')
 
+        upwork_automation_script.prompt_on_close = True
         def toggle_prompt_on_close():
             upwork_automation_script.prompt_on_close = not upwork_automation_script.prompt_on_close
             if upwork_automation_script.prompt_on_close:
@@ -65,7 +64,6 @@ class UpworkAutomationGUI:
             else:
                 self.prompt_on_close_button.configure(
                     bg="#007bff", fg="white", text="Prompt before exiting tab: OFF")
-
         self.prompt_on_close_button = tk.Button(self.master, text="Prompt before exiting tab: ON", command=toggle_prompt_on_close)
         self.prompt_on_close_button.configure(bg="green")
         self.prompt_on_close_button.grid(row=3, column=0, padx=(20, 10), pady=(0, 20))
@@ -106,7 +104,6 @@ class UpworkAutomationGUI:
             self.automation_thread.start()
             self.start_button.config(bg="green")
             self.start_button.grid_remove()
-
 
 class TextRedirector(io.TextIOBase):
     def __init__(self, widget):
