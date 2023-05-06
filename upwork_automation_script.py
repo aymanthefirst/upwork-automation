@@ -62,13 +62,13 @@ prompt_on_close = False
 def close_with_prompt(ask_continue=None, gui_instance=None):
     global prompt_on_close
 
-    if prompt_on_close:  # Check if prompt_on_close is True
+    if prompt_on_close:  
         sound_file = 'chime.wav'
         play_sound(sound_file)
         user_choice = messagebox.askyesno(
             "Submit Application?", "Do you want to submit the application?")
     else:
-        user_choice = True  # Skip the prompt and assume the user wants to submit the application
+        user_choice = True  
 
     if user_choice:
         submit_button = driver.find_element(
@@ -212,7 +212,7 @@ def get_relevance_score(prompt, gui_instance=None):
             "role": "user",
             "content": prompt
         }
-    ], gui_instance)  # Pass the gui_instance to the get_gpt_response function
+    ], gui_instance)  
     response_text = response['choices'][0]['message']['content'].strip()
     score = re.search(r'\d+(\.\d+)?', response_text)
     print("score:", score.group() if score else None)
@@ -288,8 +288,11 @@ def run_automation(stop_flag, pause_flag, gui_instance=None):
     if gui_instance is not None:
         application_limit = gui_instance.application_limit
 
-    try:
-        while not stop_flag():
+    
+    search_page_url = driver.current_url
+
+    while not stop_flag():
+        try:
             job_count = len(driver.find_elements(
                 By.CLASS_NAME, 'up-card-list-section'))
             for index in range(job_count):
@@ -326,10 +329,14 @@ def run_automation(stop_flag, pause_flag, gui_instance=None):
                             f"Error occurred during job application: {e}\n")
                         f.write(f"Job details: {job_title}\n")
                         f.write(f"Job URL: {driver.current_url}\n\n")
+                    driver.get(search_page_url)  
+                    time.sleep(5)  
                     continue
             click_next_page()
             time.sleep(5)
             jobs = driver.find_elements(By.CLASS_NAME, 'up-card-list-section')
-    except Exception as e:
-        print(str(e))
-        traceback.print_exc()
+        except Exception as e:
+            print(str(e))
+            traceback.print_exc()
+            driver.get(search_page_url)  
+            time.sleep(5)  
