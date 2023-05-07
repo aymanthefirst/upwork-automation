@@ -231,6 +231,7 @@ def generate_cover_letter(job_details, gui_instance=None):
 
     south_america_mention = " Although I am currently based in the UK, I am in the process of moving to Colombia" if "america" in job_details.lower() else ""
     chatgpt_mention = "As you can see from the video that I recently made, the way I applied for this job in itself is a demonstration of my ability to do the job at hand: https://www.youtube.com/watch?v=ImustBIx4NM\n\n" if "gpt" in job_details.lower() else ""
+    money_back_guarantee = "Although I have 4 years of experience in software development, I am new to the Upwork platform, so I understand that choosing me might feel like a risk for you. To minimize this risk and demonstrate my confidence in my abilities, I am offering a money-back guarantee policy. If you are not satisfied with my work, I will provide a full or partial refund, depending on your preference, without any questions.\n\n"
 
     prompt = [
         {
@@ -263,17 +264,18 @@ def generate_cover_letter(job_details, gui_instance=None):
     message = '\n\n'.join(paragraphs)
 
     if len(paragraphs) > 2:
-        additional_mentions = chatgpt_mention + south_america_mention
+        additional_mentions = chatgpt_mention + \
+        south_america_mention + money_back_guarantee
         paragraphs[2] = additional_mentions + paragraphs[2]
         message = '\n\n'.join(paragraphs)
 
-    save_cover_letter_to_file(job_details,message)
+    save_cover_letter_to_file(job_details, message)
     return message
 
 
 
 driver.get(
-    "https://www.upwork.com/nx/jobs/search/?q=gpt&sort=recency&user_location_match=2&duration_v3=months,semester,ongoing&location=Australia%20and%20New%20Zealand,Northern%20America,Northern%20Europe,Southern%20Europe")
+    "https://www.upwork.com/nx/jobs/search/?sort=recency&user_location_match=2&or_terms=gpt%20java&t=0,1&proposals=0-4&amount=1000-4999,5000-&hourly_rate=25-")
 
 wait = WebDriverWait(driver, 10)
 wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
