@@ -154,7 +154,8 @@ def apply(job, auto_generate_cover_letter, gui_instance):
     else:
         print("Auto-generating cover letter is disabled.")
         print("Please manually enter your cover letter into the website and submit it.")
-        input("Press 'Enter' to continue after you have submitted your cover letter.")
+        messagebox.showinfo(
+            "Enter Cover Letter", "Please enter your cover letter into the website and submit it. Then click OK to continue.")
 
     time.sleep(5)
     close_with_prompt(gui_instance=gui_instance)
