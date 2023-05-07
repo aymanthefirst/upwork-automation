@@ -108,7 +108,7 @@ def get_keywords_to_avoid():
     return keywords.split(',')
 
 
-def apply(job, gui_instance):
+def apply(job, auto_generate_cover_letter, gui_instance):
     wait = WebDriverWait(driver, 10) 
     job.click()
     print("Clicked on job title")
@@ -141,13 +141,21 @@ def apply(job, gui_instance):
         nowrap_element = None
         print("More button not found")
     try:
-        exit_if_multiple_textboxes()
+        if auto_generate_cover_letter:
+            exit_if_multiple_textboxes()
     except ValueError as ve:
         print(str(ve))
         close()
         return True
     job_details = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'fe-job-details'))).text
-    textbox.send_keys(generate_cover_letter(job_details, gui_instance))
+    if auto_generate_cover_letter:
+        textbox.send_keys(generate_cover_letter(job_details, gui_instance))
+        time.sleep(5)
+    else:
+        print("Auto-generating cover letter is disabled.")
+        print("Please manually enter your cover letter into the website and submit it.")
+        input("Press 'Enter' to continue after you have submitted your cover letter.")
+
     time.sleep(5)
     close_with_prompt(gui_instance=gui_instance)
     print("Navigated back to job search results")
@@ -281,7 +289,7 @@ wait = WebDriverWait(driver, 10)
 wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
 
 
-def run_automation(stop_flag, pause_flag, gui_instance=None):
+def run_automation(auto_generate_cover_letter, stop_flag, pause_flag, gui_instance):
     global token_counter
     token_counter = 0
     applied_count = 0
@@ -315,7 +323,8 @@ def run_automation(stop_flag, pause_flag, gui_instance=None):
                     score = get_relevance_score(
                         prompt, gui_instance=gui_instance)
                     if score >= 9 or score >= 9.0:
-                        should_continue = apply(job, gui_instance)
+                        should_continue = apply(
+                            job, auto_generate_cover_letter, gui_instance)
                         if should_continue:
                             continue
                         applied_count += 1

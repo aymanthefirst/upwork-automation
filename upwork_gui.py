@@ -133,7 +133,8 @@ class UpworkAutomationGUI:
             self.start_label.grid_remove()
             self.stop_flag = False
             self.pause_flag = False
-            self.automation_thread = threading.Thread(target=upwork_automation_script.run_automation, args=(lambda: self.stop_flag, lambda: self.pause_flag, self))
+            self.automation_thread = threading.Thread(target=upwork_automation_script.run_automation, args=(
+                upwork_automation_script.auto_generate_cover_letter, lambda: self.stop_flag, lambda: self.pause_flag, self))
             self.automation_thread.start()
             self.start_button.config(bg="green")
             self.start_button.grid_remove()
