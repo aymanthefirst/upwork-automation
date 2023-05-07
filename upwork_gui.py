@@ -68,6 +68,26 @@ class UpworkAutomationGUI:
         self.prompt_on_close_button.configure(bg="green")
         self.prompt_on_close_button.grid(row=3, column=0, padx=(20, 10), pady=(0, 20))
 
+        upwork_automation_script.auto_generate_cover_letter = False
+        def toggle_auto_generate_cover_letter():
+            upwork_automation_script.auto_generate_cover_letter = not upwork_automation_script.auto_generate_cover_letter
+            if upwork_automation_script.auto_generate_cover_letter:
+                self.auto_generate_cover_letter_button.configure(
+                    bg="green", text="Auto generate cover letter: ON")
+            else:
+                self.auto_generate_cover_letter_button.configure(
+                    bg="#007bff", fg="white", text="Auto generate cover letter: OFF")
+        self.auto_generate_cover_letter_button = tk.Button(
+            self.master, text="Auto generate cover letter: OFF", command=toggle_auto_generate_cover_letter)
+        self.auto_generate_cover_letter_button.configure(
+            bg="#007bff", fg="white")
+        self.auto_generate_cover_letter_button.grid(
+            row=3, column=1, padx=(0, 10), pady=(0, 20))
+
+        
+
+        
+
         self.keywords_label = tk.Label(self.master, text="Please enter the keywords to avoid:")
         self.keywords_label.grid(row=4, column=0, padx=(20, 10), pady=(0, 5), sticky='w')
 
