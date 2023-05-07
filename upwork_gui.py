@@ -66,7 +66,24 @@ class UpworkAutomationGUI:
                     bg="#007bff", fg="white", text="Prompt before exiting tab: OFF")
         self.prompt_on_close_button = tk.Button(self.master, text="Prompt before exiting tab: ON", command=toggle_prompt_on_close)
         self.prompt_on_close_button.configure(bg="green")
-        self.prompt_on_close_button.grid(row=3, column=0, padx=(20, 10), pady=(0, 20))
+        self.prompt_on_close_button.grid(
+            row=3, column=0, padx=(20, 5), pady=(0, 20))
+
+
+        upwork_automation_script.submit_applications = False
+        def toggle_submit_applications():
+            upwork_automation_script.submit_applications = not upwork_automation_script.submit_applications
+            if upwork_automation_script.submit_applications:
+                self.submit_applications_button.configure(bg="green", text="Submit applications: ON")
+            else:
+                self.submit_applications_button.configure(
+                    bg="#007bff", fg="white", text="Submit applications: OFF")
+        self.submit_applications_button = tk.Button(self.master, text="Submit applications: OFF", command=toggle_submit_applications)
+        self.submit_applications_button.configure(bg="#007bff", fg="white")
+        self.submit_applications_button.grid(
+            row=3, column=1, padx=(5, 5), pady=(0, 20))
+
+
 
         upwork_automation_script.auto_generate_cover_letter = False
         def toggle_auto_generate_cover_letter():
@@ -82,7 +99,9 @@ class UpworkAutomationGUI:
         self.auto_generate_cover_letter_button.configure(
             bg="#007bff", fg="white")
         self.auto_generate_cover_letter_button.grid(
-            row=3, column=1, padx=(0, 10), pady=(0, 20))
+            row=3, column=2, padx=(5, 10), pady=(0, 20))
+
+
 
         
 
