@@ -1,3 +1,4 @@
+from datetime import datetime
 from selenium.common.exceptions import ElementNotInteractableException, NoSuchElementException
 import time
 import os
@@ -154,8 +155,12 @@ def apply(job, auto_generate_cover_letter, gui_instance):
     else:
         print("Auto-generating cover letter is disabled.")
         print("Please manually enter your cover letter into the website and submit it.")
-        messagebox.showinfo(
-            "Enter Cover Letter", "Please enter your cover letter into the website and submit it. Then click OK to continue.")
+
+    with open("urls.txt", "a") as file:
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        file.write(f"{driver.current_url} - Captured on: {current_time}\n")
+
+
 
     time.sleep(5)
     close_with_prompt(gui_instance=gui_instance)
@@ -284,7 +289,7 @@ def generate_cover_letter(job_details, gui_instance=None):
 
 
 driver.get(
-    "https://www.upwork.com/nx/jobs/search/?sort=recency&user_location_match=2&or_terms=gpt%20java&t=0,1&proposals=0-4&amount=1000-4999,5000-&hourly_rate=25-")
+    "https://www.upwork.com/nx/jobs/search/?sort=recency&user_location_match=2&or_terms=gpt%20java&t=0,1&client_hires=1-9,10-&proposals=0-4,5-9,10-14,15-19,20-49&amount=1000-4999,5000-&hourly_rate=25-")
 
 wait = WebDriverWait(driver, 10)
 wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))

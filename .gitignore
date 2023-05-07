@@ -7,3 +7,4 @@ keywords_to_avoid.txt
 *.pyc
 __pycache__/
 *.log
+urls.txt
