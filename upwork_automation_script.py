@@ -141,6 +141,10 @@ def apply(job, auto_generate_cover_letter, gui_instance, submit_application):
     textbox = WebDriverWait(driver, 60).until(
         EC.element_to_be_clickable((By.XPATH, '//textarea[@aria-labelledby="cover_letter_label"]'))
     )
+    if "You do not meet" in driver.find_element(By.TAG_NAME, 'body').text:
+        print("You do not meet all the client's preferred qualifications. Skipping...")
+        close()
+        return True
     try:
         nowrap_element = driver.find_element(By.CLASS_NAME, 'up-truncation-label').click()
         print('clicked on more button')
