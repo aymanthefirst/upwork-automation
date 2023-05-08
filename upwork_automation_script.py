@@ -100,9 +100,14 @@ def play_sound(file_path):
 
 
 def close():
-    driver.close()
-    driver.switch_to.window(driver.window_handles[0])
+    original_window = driver.window_handles[0]
+    for window_handle in driver.window_handles:
+        if window_handle != original_window:
+            driver.switch_to.window(window_handle)
+            driver.close()
+    driver.switch_to.window(original_window)
     driver.back()
+
 
 def get_keywords_to_avoid():
     with open("keywords_to_avoid.txt", "r") as file:
