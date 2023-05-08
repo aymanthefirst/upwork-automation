@@ -13,9 +13,10 @@ from tkinter import messagebox
 import traceback
 import pygame
 import upwork_gui
-import datetime
 import os
 
+
+submit_applications = False
 openai.api_key = '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'
 skills = 'I have 4 years of experience in software development with a focus on Java, python, chatgpt, GPT, artificial intelligence, Spring, Spring Boot, JavaScript, HTML, CSS, Linux, Docker, Kubernetes, Selenium, Git, RESTful APIs, BASH, B2B Implementation, IT Project Solutions, Cross-functional collaboration, Multilingual skills, Project Management, Agile methodologies, Testing, BDD, TDD, Mobile Application Development, and Database Management'
 
@@ -109,7 +110,7 @@ def get_keywords_to_avoid():
     return keywords.split(',')
 
 
-def apply(job, auto_generate_cover_letter, gui_instance):
+def apply(job, auto_generate_cover_letter, gui_instance, submit_application):
     wait = WebDriverWait(driver, 10) 
     job.click()
     print("Clicked on job title")
@@ -163,7 +164,11 @@ def apply(job, auto_generate_cover_letter, gui_instance):
 
 
     time.sleep(5)
-    close_with_prompt(gui_instance=gui_instance)
+    if submit_application:
+        close_with_prompt(gui_instance=gui_instance)
+    else:
+        print("Not submitting application due to submit_application being set to False.")
+        close()
     print("Navigated back to job search results")
     wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
 
@@ -295,7 +300,8 @@ wait = WebDriverWait(driver, 10)
 wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'jobs found'))
 
 
-def run_automation(auto_generate_cover_letter, stop_flag, pause_flag, gui_instance):
+def run_automation(auto_generate_cover_letter, stop_flag,
+               pause_flag, gui_instance, submit_application):
     global token_counter
     token_counter = 0
     applied_count = 0
@@ -330,7 +336,7 @@ def run_automation(auto_generate_cover_letter, stop_flag, pause_flag, gui_instan
                         prompt, gui_instance=gui_instance)
                     if score >= 9 or score >= 9.0:
                         should_continue = apply(
-                            job, auto_generate_cover_letter, gui_instance)
+                            job, auto_generate_cover_letter, gui_instance, submit_application)
                         if should_continue:
                             continue
                         applied_count += 1
