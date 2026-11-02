@@ -8,3 +8,4 @@ keywords_to_avoid.txt
 __pycache__/
 *.log
 urls.txt
+.env
