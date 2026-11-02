@@ -31,7 +31,3 @@ python upwork_gui.py
 3. Review generated cover letters; choose whether to submit each application.
 
 Main logic: `upwork_automation_script.py`.
-
-## Repo name
-
-If this repo is still named `upwork`, rename it to **`upwork-automation`** under **Settings → General** so it matches your CV and pin label.
